@@ -4,7 +4,7 @@ import { Ad_Object } from "src/types";
 class Sas2 {
   private page: Page | null;
   private Browser: Browser | null;
-  private payload: Ad_Object[];
+  private payload: any[];
   private source: string;
   private Links: string[];
   constructor() {
@@ -13,9 +13,9 @@ class Sas2 {
     this.payload = [];
     this.Links = [
       "https://sasomange.rs/p/130484487/vrsac-na-prodaju-dvoiposoban-stan",
-      "https://sasomange.rs/p/121409123/prodajem-stan-u-valjevu",
+      /*       "https://sasomange.rs/p/121409123/prodajem-stan-u-valjevu",
       "https://sasomange.rs/p/133124313/1-5-stan-famaceutski-fakultet",
-      "https://sasomange.rs/p/133119342/stan-79m2-loznica",
+      "https://sasomange.rs/p/133119342/stan-79m2-loznica", */
     ];
     this.source =
       "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik";
@@ -42,7 +42,7 @@ class Sas2 {
 
     await this.page!.waitForTimeout(10000);
 
-    for (var i = 1; i < 5; i++) {
+    for (var i = 1; i < 2; i++) {
       try {
         await this.page!.goto(
           "https://sasomange.rs/c/stanovi-prodaja?currentPage=" +
@@ -80,57 +80,65 @@ class Sas2 {
           timeout: 0,
         });
 
-        let Price = await this.page!.$eval(
-          "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > div > div.price-and-info-wrapper > div.price-share-wrapper > p > span.price-content",
-          (el) => {
-            return (el as HTMLElement).innerText;
-          }
-        );
+        let GrabData = await this.page!.evaluate(async () => {
+          let IgLinks: string[] = [];
+          let price = document.querySelector(
+            "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > div > div.price-and-info-wrapper > div.price-share-wrapper > p > span.price-content"
+          );
 
-        console.log(Price);
+          let m2 = document.querySelector(
+            "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(1) > p.value"
+          );
 
-        let m2 = await this.page!.$eval(
-          "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(1) > p.value",
-          (el) => {
-            return (el as HTMLElement).innerText;
-          }
-        );
+          let location = document.querySelector(
+            "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > div.vue-instance.product-vendor-info-wrapper > section > section.product-location.with-map > ul"
+          );
 
-        console.log(m2);
-        let location = await this.page!.$eval(
-          "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > div.vue-instance.product-vendor-info-wrapper > section > section.product-location.with-map > ul",
-          (el) => {
-            return (el as HTMLElement).innerText;
-          }
-        );
-
-        console.log(location);
-        let rooms = await this.page!.$eval(
-          "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(2) > p.value > span",
-          (el) => {
-            return (el as HTMLElement).innerText;
-          }
-        );
-        console.log(rooms);
-
-        let ImageLinks = await this.page!.evaluate(() => {
-          let links: string[] = [];
+          let rooms = document.querySelector(
+            "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(2) > p.value > span"
+          );
           let T = document.querySelector(
             "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended"
           );
           let Gal = Array.from(T!.querySelectorAll("img.pointer"));
           Gal.map((item) => {
-            /*   let link = item.querySelector("source")?.srcset;
-            console.log(link);
-            if (link !== "") links.push(link!); */
             console.log((item as HTMLImageElement).src);
-            links.push((item as HTMLImageElement).src);
+            IgLinks.push((item as HTMLImageElement).src);
           });
 
-          return links;
-        });
+          /*  let ShowNumber = document.querySelector(
+            "#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn"
+          );
 
-        console.log(ImageLinks);
+          await (ShowNumber as HTMLElement).click();
+
+          this.page!.waitForTimeout(2000);
+
+          let PhoneNumber = await document.querySelector(
+            "body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a"
+          );
+ */
+          return {
+            property_price: price ? (price as HTMLElement).innerText : null,
+
+            square_meters: m2 ? (m2 as HTMLElement).innerText : null,
+
+            property_location: location
+              ? (location as HTMLElement).innerText
+              : null,
+
+            Number_Of_Rooms: rooms ? (rooms as HTMLElement).innerText : null,
+
+            property_pictures: IgLinks,
+
+            PhoneNumber: "",
+
+            website_source:
+              "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik",
+
+            article_url: "",
+          };
+        });
 
         await this.page!.click(
           "#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn"
@@ -145,19 +153,16 @@ class Sas2 {
           }
         );
 
-        console.log(PhoneNumber);
-        this.payload.push({
-          Number_Of_Rooms: rooms,
-          square_meters: m2,
-          property_location: location,
-          property_price: Price,
-          article_url: this.Links[i],
-          website_source: this.source,
-          property_pictures: ImageLinks,
-          PhoneNumber: PhoneNumber,
-        });
+        GrabData.PhoneNumber = PhoneNumber;
+        GrabData.article_url = this.Links[i];
+
+        this.payload.push(GrabData);
+
+        console.log(GrabData);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   public async exec() {
@@ -165,6 +170,8 @@ class Sas2 {
     if (this.page !== null) {
       await this.Bulk();
       await this.SingleAD();
+      console.log(this.Links.length);
+      console.log(this.payload.length);
     } else {
       console.log("Browser Failed To Load");
     }

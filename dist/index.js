@@ -1,3 +1,4 @@
+"use strict";
 /* import { Handler } from "./core/handler.js";
 import schedule from "node-schedule";
 

@@ -1,3 +1,4 @@
+"use strict";
 /* import { halooglasi } from "../componants/halooglasi.js";
 import { Nekretinine } from "../componants/nekretinine.js";
 import { Sasomange } from "../componants/sasomange.js";

@@ -1,0 +1,32 @@
+{
+  "name": "real_estate",
+  "version": "1.0.0",
+  "description": "a appliation to scrape multiple real estate websites",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "rimraf dist/* && tsc && cd dist && node index.js",
+    "roll": "rimraf dist/* && tsc && cd dist && node"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.191",
+    "@types/node": "^18.8.3",
+    "@types/puppeteer": "^7.0.4",
+    "@ulixee/hero": "^2.0.0-alpha.12",
+    "@ulixee/server": "^2.0.0-alpha.12",
+    "dotenv": "^16.0.3",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "node-schedule": "^2.1.0",
+    "puppeteer": "^18.2.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.8.4",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/node-schedule": "^2.1.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

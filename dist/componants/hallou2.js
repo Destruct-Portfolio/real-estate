@@ -8,7 +8,7 @@ class Halou {
     Page_Numbers;
     constructor() {
         this.links = [
-        /* "https://www.halooglasi.com/nekretnine/prodaja-stanova/vracar-gospodara-vucica-stan-parking-4-0/5425642589594?kid=4&sid=1670336781105", */
+            "https://www.halooglasi.com/nekretnine/prodaja-stanova/vracar-gospodara-vucica-stan-parking-4-0/5425642589594?kid=4&sid=1670336781105",
         ];
         this.payload = [];
         this.source =
@@ -68,57 +68,38 @@ class Halou {
                     waitUntil: "networkidle2",
                     timeout: 0,
                 });
-                let NumberOfRooms = await this.page.$eval("#plh13", (el) => {
-                    return el.innerText;
-                });
-                // console.log(NumberOfRooms);
-                let square_meters = await this.page.$eval("#plh12", (el) => {
-                    return el.innerText;
-                });
-                //   console.log(square_meters);
-                let property_location = await this.page.$eval("#plh3", (el) => {
-                    return el.innerText;
-                });
-                //   console.log(property_location);
-                let property_price = await this.page.$eval("#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail", (el) => {
-                    return el.innerText;
-                });
-                //   console.log(property_price);
-                let property_pictures = await this.page.$$eval("#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img", (item) => {
-                    let t = item.map((img) => {
-                        //          console.log((img as HTMLImageElement).src);
-                        return img.src;
-                    });
-                    return t;
-                });
-                //  console.log(property_pictures);
                 let PhoneNumber = await this.page.click("#plh70 > div > p > span > em");
                 await this.page.waitForTimeout(3000);
                 let Phonenmber2 = await this.page.$eval("#plh70 > a", (el) => {
                     return el.innerText;
                 });
-                //    console.log(Phonenmber2);
-                console.log({
-                    Number_Of_Rooms: NumberOfRooms ? NumberOfRooms : null,
-                    property_location,
-                    square_meters,
-                    property_price,
-                    PhoneNumber: Phonenmber2,
-                    article_url: this.links[i],
-                    website_source: this.source,
-                    property_pictures: property_pictures,
+                let ArticleData = await this.page.evaluate(() => {
+                    let Rooms = document.querySelector("#plh13");
+                    let meter = document.querySelector("#plh12");
+                    let location = document.querySelector("#plh3");
+                    let price = document.querySelector("#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail");
+                    let images = Array.from(document.querySelectorAll("#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img")).map((item) => {
+                        console.log(item.src);
+                        return item.src;
+                    });
+                    return {
+                        Number_Of_Rooms: Rooms ? Rooms.innerText : null,
+                        square_meters: meter ? meter.innerText : null,
+                        property_location: location
+                            ? location.innerText
+                            : null,
+                        property_price: price ? price.innerText : null,
+                        article_url: "",
+                        website_source: "",
+                        property_pictures: images ? images : null,
+                        PhoneNumber: "",
+                    };
                 });
-                this.payload.push({
-                    Number_Of_Rooms: NumberOfRooms ? NumberOfRooms : null,
-                    property_location,
-                    square_meters,
-                    property_price,
-                    PhoneNumber: Phonenmber2,
-                    article_url: this.links[i],
-                    website_source: this.source,
-                    property_pictures: property_pictures,
-                });
-                console.log(this.payload.length);
+                ArticleData.article_url = this.links[i];
+                ArticleData.website_source = this.source;
+                ArticleData.PhoneNumber = Phonenmber2;
+                console.log(ArticleData);
+                this.payload.push(ArticleData);
             }
             catch (error) {
                 console.log("Url Not Proccessed for Some God Knows why");
@@ -135,6 +116,7 @@ class Halou {
             console.log(this.links.length);
             await this.singleADD();
             await this.CleenUp();
+            return this.payload;
         }
     }
 }

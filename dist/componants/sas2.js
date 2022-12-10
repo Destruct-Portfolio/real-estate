@@ -70,18 +70,6 @@ class Sas2 {
                         console.log(item.src);
                         IgLinks.push(item.src);
                     });
-                    /*  let ShowNumber = document.querySelector(
-                      "#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn"
-                    );
-          
-                    await (ShowNumber as HTMLElement).click();
-          
-                    this.page!.waitForTimeout(2000);
-          
-                    let PhoneNumber = await document.querySelector(
-                      "body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a"
-                    );
-           */
                     return {
                         property_price: price ? price.innerText : null,
                         square_meters: m2 ? m2.innerText : null,

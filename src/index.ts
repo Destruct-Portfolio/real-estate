@@ -1,4 +1,4 @@
-/* import { Handler } from "./core/handler.js";
+import { Handler } from "./core/handler.js";
 import schedule from "node-schedule";
 
 //Igniter
@@ -18,10 +18,10 @@ TimeConfig.hour = 4;
 TimeConfig.minute = 0;
 
 console.log("STARTED ...");
+
 await Index.start();
 
 //lights
 var job = schedule.scheduleJob(TimeConfig, async () => {
   await Index.start();
 });
- */

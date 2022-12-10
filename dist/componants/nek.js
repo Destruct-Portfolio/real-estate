@@ -55,53 +55,48 @@ class Nek {
                     waitUntil: "networkidle2",
                     timeout: 0,
                 });
-                let property_location = await this.page.$eval("#lokacija > div.property__location", (el) => {
-                    return el.innerText.split("\n").join(" ");
-                });
-                // console.log(property_location);
-                let NumberofRooms = await this.page.$eval("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div:nth-child(6) > div > ul > li:nth-child(2) > span", (el) => {
-                    return el.innerText.split("\n")[1];
-                });
-                //console.log(NumberofRooms);
-                let property_price = await this.page.$eval("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.stickyBox > div.stickyBox__price-size > h4.stickyBox__price", (el) => {
-                    return el.innerText.split("\n")[0];
-                });
-                //console.log(property_price);
-                let square_meters = await this.page.$eval("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.stickyBox > div.stickyBox__price-size > h4.stickyBox__size", (el) => {
-                    return el.innerText;
-                });
-                //console.log(square_meters);
-                await this.page.click("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > button");
-                await this.page?.waitForTimeout(3000);
-                let phoneNumber = await this.page.$eval("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > a", (el) => {
-                    return el.innerText;
-                });
-                //console.log(phoneNumber);
-                let ImageLinks = await this.page.evaluate(() => {
-                    let links = [];
+                let ArticleData = await this.page.evaluate(async () => {
+                    let ImageLinks = [];
+                    let price = await document.querySelector("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.stickyBox > div.stickyBox__price-size > h4.stickyBox__price");
+                    let location = await document.querySelector("#lokacija > div.property__location");
+                    let Rooms = await document.querySelector("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div:nth-child(6) > div > ul > li:nth-child(2) > span");
+                    let square_meters = await document.querySelector("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.stickyBox > div.stickyBox__price-size > h4.stickyBox__size");
                     let T = document.querySelector("#top");
                     let Gal = Array.from(T.querySelectorAll("picture"));
                     Gal.map((item) => {
                         let link = item.querySelector("source")?.srcset;
                         console.log(link);
                         if (link !== "")
-                            links.push(link);
+                            ImageLinks.push(link);
                     });
-                    return links;
+                    return {
+                        Number_Of_Rooms: Rooms
+                            ? Rooms.innerText.split("\n")[1]
+                            : null,
+                        square_meters: square_meters
+                            ? square_meters.innerText
+                            : null,
+                        property_location: location
+                            ? location.innerText.split("\n").join(" ")
+                            : null,
+                        property_price: price
+                            ? price.innerText.split("\n")[1]
+                            : null,
+                        article_url: "",
+                        website_source: "",
+                        property_pictures: ImageLinks ? ImageLinks : [],
+                        PhoneNumber: "",
+                    };
                 });
-                //console.log(ImageLinks);
-                let FinalObject = {
-                    Number_Of_Rooms: NumberofRooms ? NumberofRooms : null,
-                    square_meters: square_meters ? square_meters : null,
-                    property_location: property_location ? property_location : null,
-                    property_price: property_price ? property_price : property_price,
-                    article_url: this.Links[i],
-                    website_source: this.source,
-                    property_pictures: ImageLinks ? ImageLinks : [],
-                    PhoneNumber: phoneNumber ? phoneNumber : null,
-                };
-                console.log(FinalObject);
-                this.payload.push(FinalObject);
+                await this.page.click("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > button");
+                await this.page?.waitForTimeout(3000);
+                let phoneNumber = await this.page.$eval("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > a", (el) => {
+                    return el.innerText;
+                });
+                ArticleData.article_url = this.Links[i];
+                ArticleData.website_source = this.source;
+                ArticleData.PhoneNumber = phoneNumber;
+                console.log(ArticleData);
             }
             catch (error) { }
         }
@@ -109,7 +104,7 @@ class Nek {
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            await this.Collect_Links();
+            // await this.Collect_Links();
             await this.SingleAD();
             return this.payload;
         }

@@ -1,7 +1,7 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object } from "src/types";
 
-class Halou {
+export class halooglasi {
   private payload: Ad_Object[];
   private source: string;
   private browser: Browser | null;
@@ -10,7 +10,7 @@ class Halou {
   private Page_Numbers: number;
   constructor() {
     this.links = [
-      /* "https://www.halooglasi.com/nekretnine/prodaja-stanova/vracar-gospodara-vucica-stan-parking-4-0/5425642589594?kid=4&sid=1670336781105", */
+      //  "https://www.halooglasi.com/nekretnine/prodaja-stanova/vracar-gospodara-vucica-stan-parking-4-0/5425642589594?kid=4&sid=1670336781105",
     ];
     this.payload = [];
     this.source =
@@ -80,41 +80,6 @@ class Halou {
           timeout: 0,
         });
 
-        let NumberOfRooms = await this.page!.$eval("#plh13", (el) => {
-          return (el as HTMLElement).innerText;
-        });
-
-        // console.log(NumberOfRooms);
-        let square_meters = await this.page!.$eval("#plh12", (el) => {
-          return (el as HTMLElement).innerText;
-        });
-
-        //   console.log(square_meters);
-        let property_location = await this.page!.$eval("#plh3", (el) => {
-          return (el as HTMLElement).innerText;
-        });
-
-        //   console.log(property_location);
-        let property_price = await this.page!.$eval(
-          "#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail",
-          (el) => {
-            return (el as HTMLElement).innerText;
-          }
-        );
-        //   console.log(property_price);
-
-        let property_pictures = await this.page!.$$eval(
-          "#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img",
-          (item) => {
-            let t = item.map((img) => {
-              //          console.log((img as HTMLImageElement).src);
-              return (img as HTMLImageElement).src;
-            });
-            return t;
-          }
-        );
-        //  console.log(property_pictures);
-
         let PhoneNumber = await this.page!.click(
           "#plh70 > div > p > span > em"
         );
@@ -125,30 +90,44 @@ class Halou {
           return (el as HTMLElement).innerText;
         });
 
-        //    console.log(Phonenmber2);
+        let ArticleData = await this.page!.evaluate(() => {
+          let Rooms = document.querySelector("#plh13");
+          let meter = document.querySelector("#plh12");
+          let location = document.querySelector("#plh3");
+          let price = document.querySelector(
+            "#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail"
+          );
 
-        console.log({
-          Number_Of_Rooms: NumberOfRooms ? NumberOfRooms : null,
-          property_location,
-          square_meters,
-          property_price,
-          PhoneNumber: Phonenmber2,
-          article_url: this.links[i],
-          website_source: this.source,
-          property_pictures: property_pictures,
-        });
-        this.payload.push({
-          Number_Of_Rooms: NumberOfRooms ? NumberOfRooms : null,
-          property_location,
-          square_meters,
-          property_price,
-          PhoneNumber: Phonenmber2,
-          article_url: this.links[i],
-          website_source: this.source,
-          property_pictures: property_pictures,
+          let images = Array.from(
+            document.querySelectorAll(
+              "#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img"
+            )
+          ).map((item) => {
+            console.log((item as HTMLImageElement).src);
+            return (item as HTMLImageElement).src;
+          });
+
+          return {
+            Number_Of_Rooms: Rooms ? (Rooms as HTMLElement).innerText : null,
+            square_meters: meter ? (meter as HTMLElement).innerText : null,
+            property_location: location
+              ? (location as HTMLElement).innerText
+              : null,
+            property_price: price ? (price as HTMLElement).innerText : null,
+            article_url: "",
+            website_source: "",
+            property_pictures: images ? images : null,
+            PhoneNumber: "",
+          };
         });
 
-        console.log(this.payload.length);
+        ArticleData.article_url = this.links[i];
+        ArticleData.website_source = this.source;
+        ArticleData.PhoneNumber = Phonenmber2;
+
+        console.log(ArticleData);
+
+        this.payload.push(ArticleData);
       } catch (error) {
         console.log("Url Not Proccessed for Some God Knows why");
       }
@@ -163,9 +142,14 @@ class Halou {
       await this.Bulk();
       console.log(this.links.length);
       await this.singleADD();
+      console.log(this.links.length);
+      console.log(this.payload.length);
       await this.CleenUp();
+      // return this.payload;
+    } else {
+      return this.payload;
     }
   }
 }
 
-console.log(await new Halou().exec());
+console.log(await new halooglasi().exec());

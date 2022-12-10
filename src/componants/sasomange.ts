@@ -1,18 +1,22 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object } from "src/types";
+import Logger from "../misc/logger.js";
 
-class Sas2 {
+export class Sasomange {
   private page: Page | null;
   private Browser: Browser | null;
-  private payload: any[];
+  private payload: Ad_Object[];
   private source: string;
   private Links: string[];
+  private Logger: Logger;
   constructor() {
+    this.Logger = new Logger("scrapper", "Sasomange");
+
     this.page = null;
     this.Browser = null;
     this.payload = [];
     this.Links = [
-      "https://sasomange.rs/p/130484487/vrsac-na-prodaju-dvoiposoban-stan",
+      //"https://sasomange.rs/p/130484487/vrsac-na-prodaju-dvoiposoban-stan",
       /*       "https://sasomange.rs/p/121409123/prodajem-stan-u-valjevu",
       "https://sasomange.rs/p/133124313/1-5-stan-famaceutski-fakultet",
       "https://sasomange.rs/p/133119342/stan-79m2-loznica", */
@@ -22,11 +26,16 @@ class Sas2 {
   }
 
   private async setup() {
+    this.Logger.info("Puppeteer launching ... ");
+
     this.Browser = await puppeteer.launch({ headless: false });
+
     this.page = await this.Browser.newPage();
   }
 
   private async Bulk() {
+    this.Logger.info("Grabing AD links in Multiple Links ... ");
+
     await this.page!.goto(this.source, {
       waitUntil: "networkidle2",
       timeout: 0,
@@ -42,7 +51,7 @@ class Sas2 {
 
     await this.page!.waitForTimeout(10000);
 
-    for (var i = 1; i < 2; i++) {
+    for (var i = 1; i < 34; i++) {
       try {
         await this.page!.goto(
           "https://sasomange.rs/c/stanovi-prodaja?currentPage=" +
@@ -73,6 +82,8 @@ class Sas2 {
   }
 
   private async SingleAD() {
+    this.Logger.info("Starting Scraping For each AD Link Collected ... ");
+
     try {
       for (var i = 0; i < this.Links.length; i++) {
         await this.page!.goto(this.Links[i], {
@@ -106,18 +117,6 @@ class Sas2 {
             IgLinks.push((item as HTMLImageElement).src);
           });
 
-          /*  let ShowNumber = document.querySelector(
-            "#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn"
-          );
-
-          await (ShowNumber as HTMLElement).click();
-
-          this.page!.waitForTimeout(2000);
-
-          let PhoneNumber = await document.querySelector(
-            "body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a"
-          );
- */
           return {
             property_price: price ? (price as HTMLElement).innerText : null,
 
@@ -164,18 +163,32 @@ class Sas2 {
       console.log(error);
     }
   }
+  private async cleanUp() {
+    this.Logger.info("Closing Down Puppetteer");
+    await this.Browser!.close();
+  }
 
   public async exec() {
     await this.setup();
     if (this.page !== null) {
       await this.Bulk();
+
       await this.SingleAD();
-      console.log(this.Links.length);
-      console.log(this.payload.length);
+
+      await this.cleanUp();
+
+      /*       console.log(this.Links.length);
+      console.log(this.payload.length); */
+
+      return this.payload;
     } else {
-      console.log("Browser Failed To Load");
+      //console.log("Browser Failed To Load");
+
+      this.Logger.info("Puppeteer Failed To Lunch . ");
+
+      return this.payload;
     }
   }
 }
 
-console.log(await new Sas2().exec());
+console.log(await new Sasomange().exec());

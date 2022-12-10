@@ -2,7 +2,7 @@ import puppeteer, { Browser, Page, Puppeteer } from "puppeteer";
 
 import { Ad_Object } from "src/types";
 
-import Logger from "../misc/logger";
+import Logger from "../misc/logger.js";
 
 export class Nekretinine {
   private Logger: Logger;
@@ -35,7 +35,7 @@ export class Nekretinine {
   private async setup() {
     this.Logger.info("Puppeteer launching ... ");
 
-    this.browser = await puppeteer.launch({ headless: false });
+    this.browser = await puppeteer.launch({ headless: true });
 
     this.page = await this.browser.newPage();
   }
@@ -159,6 +159,8 @@ export class Nekretinine {
         ArticleData.website_source = this.source;
         ArticleData.PhoneNumber = phoneNumber;
         console.log(ArticleData);
+
+        this.payload.push(ArticleData);
       } catch (error) {}
     }
   }

@@ -13,7 +13,7 @@ const TimeConfig = new schedule.RecurrenceRule();
 
 TimeConfig.dayOfWeek = [0, new schedule.Range(0, 6)];
 
-TimeConfig.hour = 4;
+TimeConfig.hour = 8;
 
 TimeConfig.minute = 0;
 

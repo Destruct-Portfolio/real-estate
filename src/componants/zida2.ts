@@ -4,10 +4,15 @@ import Logger from "../misc/logger.js";
 
 export class Zida {
   private Logger: Logger;
+
   private page: Page | null;
+
   private Browser: Browser | null;
+
   private source: string;
+
   private Links: string[];
+
   private payload: Ad_Object[];
   constructor() {
     this.Logger = new Logger("scrapper", "ZIDA");
@@ -27,7 +32,7 @@ export class Zida {
   private async setup() {
     this.Logger.info("Puppeteer launching ... ");
 
-    this.Browser = await puppeteer.launch({ headless: false });
+    this.Browser = await puppeteer.launch({ headless: true });
 
     this.page = await this.Browser.newPage();
   }
@@ -159,5 +164,3 @@ export class Zida {
     }
   }
 }
-
-// console.log(await new Zida().exec());

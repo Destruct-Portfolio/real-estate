@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-class Halou {
+export class halooglasi {
     payload;
     source;
     browser;
@@ -7,9 +7,7 @@ class Halou {
     links;
     Page_Numbers;
     constructor() {
-        this.links = [
-            "https://www.halooglasi.com/nekretnine/prodaja-stanova/vracar-gospodara-vucica-stan-parking-4-0/5425642589594?kid=4&sid=1670336781105",
-        ];
+        this.links = [];
         this.payload = [];
         this.source =
             "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
@@ -18,7 +16,7 @@ class Halou {
         this.Page_Numbers = 0;
     }
     async setup() {
-        this.browser = await puppeteer.launch({ headless: false });
+        this.browser = await puppeteer.launch({ headless: true });
         this.page = await this.browser.newPage();
     }
     async Bulk() {
@@ -101,9 +99,7 @@ class Halou {
                 console.log(ArticleData);
                 this.payload.push(ArticleData);
             }
-            catch (error) {
-                console.log("Url Not Proccessed for Some God Knows why");
-            }
+            catch (error) { }
         }
     }
     async CleenUp() {
@@ -115,9 +111,14 @@ class Halou {
             await this.Bulk();
             console.log(this.links.length);
             await this.singleADD();
+            console.log(this.links.length);
+            console.log(this.payload.length);
             await this.CleenUp();
+            return this.payload;
+        }
+        else {
             return this.payload;
         }
     }
 }
-console.log(await new Halou().exec());
+// console.log(await new halooglasi().exec());

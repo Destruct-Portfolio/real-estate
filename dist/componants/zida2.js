@@ -1,26 +1,29 @@
 import puppeteer from "puppeteer";
-class Zidda {
+import Logger from "../misc/logger.js";
+export class Zida {
+    Logger;
     page;
     Browser;
     source;
     Links;
+    payload;
     constructor() {
+        this.Logger = new Logger("scrapper", "ZIDA");
         this.page = null;
         this.Browser = null;
-        this.Links = [
-            "https://www.4zida.rs/prodaja/stanovi/beograd/oglas/cerski-venac/63888febd5114a6875020983",
-            "https://www.4zida.rs/prodaja/stanovi/pancevo/oglas/breza-42/60f7179eaa457b654b5106b7",
-            "https://www.4zida.rs/prodaja/stanovi/novi-sad/oglas/dr-dusana-popovica-4v/6387d8348bd103945909832e",
-        ];
+        this.Links = [];
         this.source =
             "https://www.4zida.rs/prodaja-stanova?lista_fizickih_lica=1&strana=";
+        this.payload = [];
     }
     async setup() {
-        this.Browser = await puppeteer.launch({ headless: false });
+        this.Logger.info("Puppeteer launching ... ");
+        this.Browser = await puppeteer.launch({ headless: true });
         this.page = await this.Browser.newPage();
     }
     async Bulk() {
-        for (var i = 1; i < 5; i++) {
+        this.Logger.info("Grabing AD links in Multiple Links ... ");
+        for (var i = 1; i < 30; i++) {
             try {
                 await this.page.goto(this.source + i, {
                     waitUntil: "networkidle2",
@@ -41,6 +44,7 @@ class Zidda {
         }
     }
     async SingleAD() {
+        this.Logger.info("Starting Scraping For each AD Link Collected ... ");
         for (var i = 0; i < this.Links.length; i++) {
             await this.page.goto(this.Links[i], {
                 waitUntil: "networkidle2",
@@ -78,17 +82,24 @@ class Zidda {
             articleData.website_source = this.source;
             articleData.article_url = this.Links[i];
             console.log(articleData);
+            this.payload.push(articleData);
         }
+    }
+    async CleanUp() {
+        this.Logger.info("Closing Down Puppetteer");
+        await this.Browser.close();
     }
     async exec() {
         await this.setup();
         if (this.page !== null) {
             await this.Bulk();
-            //await this.SingleAD();
+            await this.SingleAD();
+            await this.CleanUp();
+            return this.payload;
         }
         else {
-            console.log("Browser Failed To lunch");
+            this.Logger.info("Puppeteer Failed To Lunch . ");
+            return this.payload;
         }
     }
 }
-console.log(await new Zidda().exec());

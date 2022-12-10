@@ -9,9 +9,7 @@ export class halooglasi {
   private links: string[];
   private Page_Numbers: number;
   constructor() {
-    this.links = [
-      //  "https://www.halooglasi.com/nekretnine/prodaja-stanova/vracar-gospodara-vucica-stan-parking-4-0/5425642589594?kid=4&sid=1670336781105",
-    ];
+    this.links = [];
     this.payload = [];
     this.source =
       "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
@@ -21,7 +19,7 @@ export class halooglasi {
   }
 
   private async setup() {
-    this.browser = await puppeteer.launch({ headless: false });
+    this.browser = await puppeteer.launch({ headless: true });
     this.page = await this.browser.newPage();
   }
 
@@ -128,9 +126,7 @@ export class halooglasi {
         console.log(ArticleData);
 
         this.payload.push(ArticleData);
-      } catch (error) {
-        console.log("Url Not Proccessed for Some God Knows why");
-      }
+      } catch (error) {}
     }
   }
   private async CleenUp() {
@@ -145,11 +141,11 @@ export class halooglasi {
       console.log(this.links.length);
       console.log(this.payload.length);
       await this.CleenUp();
-      // return this.payload;
+      return this.payload;
     } else {
       return this.payload;
     }
   }
 }
 
-console.log(await new halooglasi().exec());
+// console.log(await new halooglasi().exec());

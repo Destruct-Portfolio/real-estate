@@ -1,5 +1,7 @@
 import puppeteer from "puppeteer";
-class Nek {
+import Logger from "../misc/logger.js";
+export class Nekretinine {
+    Logger;
     browser;
     page;
     Links;
@@ -8,31 +10,30 @@ class Nek {
     constructor() {
         this.browser = null;
         this.page = null;
-        this.Links = [
-            "https://www.nekretnine.rs/stambeni-objekti/stanovi/renoviran-luksuzan-stan-u-centru-beograda/NkqUU0Cc8QL/",
-            "https://www.nekretnine.rs/stambeni-objekti/stanovi/lekino-brdo-i-sp-20-avg-23-bez-provizije/Nk-8DV3FYqg/",
-            "https://www.nekretnine.rs/stambeni-objekti/stanovi/3-5-stan-kompletno-renoviran-i-opremljen/Nka5dkMPHTB/",
-        ];
+        this.Logger = new Logger("scrapper", "Nekretinine");
+        this.Links = [];
         this.source =
             "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/";
         this.payload = [];
     }
     async setup() {
-        this.browser = await puppeteer.launch({ headless: false });
+        this.Logger.info("Puppeteer launching ... ");
+        this.browser = await puppeteer.launch({ headless: true });
         this.page = await this.browser.newPage();
     }
     async Collect_Links() {
+        this.Logger.info("Grabing AD links in Multiple Links ... ");
         await this.page.goto(this.source, {
             waitUntil: "networkidle2",
             timeout: 0,
         });
-        for (var i = 0; i < 5; i++) {
+        for (var i = 1; i < 6; i++) {
             try {
                 await this.page.goto(this.source + "/" + i + "/", {
                     waitUntil: "networkidle2",
                     timeout: 0,
                 });
-                console.log(this.page.url());
+                this.Logger.info(this.page.url());
                 let PageLinks = await this.page?.$$eval("div.row.offer", (item) => {
                     let t = item.map((item) => {
                         return item.querySelector("a").href;
@@ -44,11 +45,12 @@ class Nek {
                 });
             }
             catch (error) {
-                console.log(error);
+                /*       console.log(error); */
             }
         }
     }
     async SingleAD() {
+        this.Logger.info("Starting Scraping For each AD Link Collected ... ");
         for (var i = 0; i < this.Links.length; i++) {
             try {
                 await this.page.goto(this.Links[i], {
@@ -97,20 +99,31 @@ class Nek {
                 ArticleData.website_source = this.source;
                 ArticleData.PhoneNumber = phoneNumber;
                 console.log(ArticleData);
+                this.payload.push(ArticleData);
             }
             catch (error) { }
         }
     }
+    async CleanUp() {
+        this.Logger.info("Closing Down Puppetteer");
+        await this.browser.close();
+    }
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            // await this.Collect_Links();
+            await this.Collect_Links();
             await this.SingleAD();
+            await this.CleanUp();
+            /*       console.log(this.Links.length);
+      
+            console.log(this.payload.length); */
             return this.payload;
         }
         else {
-            console.log("Puppeteer Failed To lunch");
+            /*    console.log("Puppeteer Failed To lunch"); */
+            this.Logger.info("Puppeteer Failed To Lunch . ");
+            return this.payload;
         }
     }
 }
-console.log(await new Nek().exec());
+//console.log(await new Nekretinine().exec());

@@ -75,5 +75,6 @@ export class Saver {
     PhoneNumber: "string",
   },
 ];
+
+console.log(await new Saver(Payload, "neko").exec());
  */
-//console.log(await new Saver(Payload, "neko").exec());

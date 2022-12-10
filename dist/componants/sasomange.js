@@ -1,28 +1,33 @@
 import puppeteer from "puppeteer";
-class Sas2 {
+import Logger from "../misc/logger.js";
+export class Sasomange {
     page;
     Browser;
     payload;
     source;
     Links;
+    Logger;
     constructor() {
+        this.Logger = new Logger("scrapper", "Sasomange");
         this.page = null;
         this.Browser = null;
         this.payload = [];
         this.Links = [
-            "https://sasomange.rs/p/130484487/vrsac-na-prodaju-dvoiposoban-stan",
-            /*       "https://sasomange.rs/p/121409123/prodajem-stan-u-valjevu",
-            "https://sasomange.rs/p/133124313/1-5-stan-famaceutski-fakultet",
-            "https://sasomange.rs/p/133119342/stan-79m2-loznica", */
+        //"https://sasomange.rs/p/130484487/vrsac-na-prodaju-dvoiposoban-stan",
+        /*       "https://sasomange.rs/p/121409123/prodajem-stan-u-valjevu",
+        "https://sasomange.rs/p/133124313/1-5-stan-famaceutski-fakultet",
+        "https://sasomange.rs/p/133119342/stan-79m2-loznica", */
         ];
         this.source =
             "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik";
     }
     async setup() {
-        this.Browser = await puppeteer.launch({ headless: false });
+        this.Logger.info("Puppeteer launching ... ");
+        this.Browser = await puppeteer.launch({ headless: true });
         this.page = await this.Browser.newPage();
     }
     async Bulk() {
+        this.Logger.info("Grabing AD links in Multiple Links ... ");
         await this.page.goto(this.source, {
             waitUntil: "networkidle2",
             timeout: 0,
@@ -31,7 +36,7 @@ class Sas2 {
         await this.page.waitForTimeout(2000);
         await this.page.click("#CybotCookiebotDialogBodyButtonAccept");
         await this.page.waitForTimeout(10000);
-        for (var i = 1; i < 2; i++) {
+        for (var i = 1; i < 34; i++) {
             try {
                 await this.page.goto("https://sasomange.rs/c/stanovi-prodaja?currentPage=" +
                     i +
@@ -52,6 +57,7 @@ class Sas2 {
         }
     }
     async SingleAD() {
+        this.Logger.info("Starting Scraping For each AD Link Collected ... ");
         try {
             for (var i = 0; i < this.Links.length; i++) {
                 await this.page.goto(this.Links[i], {
@@ -98,17 +104,25 @@ class Sas2 {
             console.log(error);
         }
     }
+    async cleanUp() {
+        this.Logger.info("Closing Down Puppetteer");
+        await this.Browser.close();
+    }
     async exec() {
         await this.setup();
         if (this.page !== null) {
             await this.Bulk();
             await this.SingleAD();
-            console.log(this.Links.length);
-            console.log(this.payload.length);
+            await this.cleanUp();
+            /*       console.log(this.Links.length);
+            console.log(this.payload.length); */
+            return this.payload;
         }
         else {
-            console.log("Browser Failed To Load");
+            //console.log("Browser Failed To Load");
+            this.Logger.info("Puppeteer Failed To Lunch . ");
+            return this.payload;
         }
     }
 }
-console.log(await new Sas2().exec());
+console.log(await new Sasomange().exec());

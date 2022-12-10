@@ -28,7 +28,7 @@ export class Sasomange {
   private async setup() {
     this.Logger.info("Puppeteer launching ... ");
 
-    this.Browser = await puppeteer.launch({ headless: false });
+    this.Browser = await puppeteer.launch({ headless: true });
 
     this.page = await this.Browser.newPage();
   }

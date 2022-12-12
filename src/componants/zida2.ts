@@ -13,6 +13,8 @@ export class Zida {
 
   private Links: string[];
 
+  private Links2: Set<string>;
+
   private payload: Ad_Object[];
   constructor() {
     this.Logger = new Logger("scrapper", "ZIDA");
@@ -27,6 +29,8 @@ export class Zida {
       "https://www.4zida.rs/prodaja-stanova?lista_fizickih_lica=1&strana=";
 
     this.payload = [];
+
+    this.Links2 = new Set();
   }
 
   private async setup() {
@@ -59,6 +63,7 @@ export class Zida {
 
         PageLinks?.map((item) => {
           this.Links.push(item);
+          this.Links2.add(item);
         });
       } catch (error) {}
     }
@@ -151,11 +156,10 @@ export class Zida {
     await this.setup();
     if (this.page !== null) {
       await this.Bulk();
-
-      await this.SingleAD();
-
+      //await this.SingleAD();
       await this.CleanUp();
-
+      console.log(this.Links.length);
+      console.log(this.Links2.size);
       return this.payload;
     } else {
       this.Logger.info("Puppeteer Failed To Lunch . ");

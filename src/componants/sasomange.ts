@@ -9,6 +9,7 @@ export class Sasomange {
   private source: string;
   private Links: string[];
   private Logger: Logger;
+  private Links2: Set<string>;
   constructor() {
     this.Logger = new Logger("scrapper", "Sasomange");
 
@@ -22,7 +23,9 @@ export class Sasomange {
       "https://sasomange.rs/p/133119342/stan-79m2-loznica", */
     ];
     this.source =
-      "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik";
+      "https://sasomange.rs/c/stanovi-prodaja/f/beograd?productsFacets.facets=status%3AACTIVE%2Cflat_advertiser_to_sale%3AVlasnik";
+
+    this.Links2 = new Set();
   }
 
   private async setup() {
@@ -51,12 +54,10 @@ export class Sasomange {
 
     await this.page!.waitForTimeout(10000);
 
-    for (var i = 1; i < 34; i++) {
+    for (var i = 0; i < 13; i++) {
       try {
         await this.page!.goto(
-          "https://sasomange.rs/c/stanovi-prodaja?currentPage=" +
-            i +
-            "&productsFacets.facets=flat_advertiser_to_sale%3AVlasnik",
+          `https://sasomange.rs/c/stanovi-prodaja/f/beograd?currentPage=${i}&productsFacets.facets=flat_advertiser_to_sale%3AVlasnik`,
           { waitUntil: "networkidle2", timeout: 0 }
         );
 
@@ -74,6 +75,7 @@ export class Sasomange {
 
         PageLinks?.map((link) => {
           this.Links.push(link);
+          this.Links2.add(link);
         });
 
         console.log(PageLinks);
@@ -173,9 +175,12 @@ export class Sasomange {
     if (this.page !== null) {
       await this.Bulk();
 
-      await this.SingleAD();
+      //await this.SingleAD();
 
       await this.cleanUp();
+
+      console.log(this.Links.length);
+      console.log(this.Links2.size);
 
       /*       console.log(this.Links.length);
       console.log(this.payload.length); */

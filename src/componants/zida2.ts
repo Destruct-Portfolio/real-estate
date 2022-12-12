@@ -168,3 +168,5 @@ export class Zida {
     }
   }
 }
+
+console.log(new Zida().exec());

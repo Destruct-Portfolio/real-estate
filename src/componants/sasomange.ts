@@ -1,6 +1,7 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object } from "src/types";
 import Logger from "../misc/logger.js";
+import { Save2 } from "../core/save.js";
 
 export class Sasomange {
   private page: Page | null;
@@ -9,23 +10,20 @@ export class Sasomange {
   private source: string;
   private Links: string[];
   private Logger: Logger;
-  private Links2: Set<string>;
+
   constructor() {
     this.Logger = new Logger("scrapper", "Sasomange");
 
     this.page = null;
+
     this.Browser = null;
+
     this.payload = [];
-    this.Links = [
-      //"https://sasomange.rs/p/130484487/vrsac-na-prodaju-dvoiposoban-stan",
-      /*       "https://sasomange.rs/p/121409123/prodajem-stan-u-valjevu",
-      "https://sasomange.rs/p/133124313/1-5-stan-famaceutski-fakultet",
-      "https://sasomange.rs/p/133119342/stan-79m2-loznica", */
-    ];
+
+    this.Links = [];
+
     this.source =
       "https://sasomange.rs/c/stanovi-prodaja/f/beograd?productsFacets.facets=status%3AACTIVE%2Cflat_advertiser_to_sale%3AVlasnik";
-
-    this.Links2 = new Set();
   }
 
   private async setup() {
@@ -54,7 +52,7 @@ export class Sasomange {
 
     await this.page!.waitForTimeout(10000);
 
-    for (var i = 0; i < 13; i++) {
+    for (var i = 1; i < 12; i++) {
       try {
         await this.page!.goto(
           `https://sasomange.rs/c/stanovi-prodaja/f/beograd?currentPage=${i}&productsFacets.facets=flat_advertiser_to_sale%3AVlasnik`,
@@ -75,7 +73,6 @@ export class Sasomange {
 
         PageLinks?.map((link) => {
           this.Links.push(link);
-          this.Links2.add(link);
         });
 
         console.log(PageLinks);
@@ -125,7 +122,7 @@ export class Sasomange {
             square_meters: m2 ? (m2 as HTMLElement).innerText : null,
 
             property_location: location
-              ? (location as HTMLElement).innerText
+              ? (location as HTMLElement).innerText.split("\n").join(" ")
               : null,
 
             Number_Of_Rooms: rooms ? (rooms as HTMLElement).innerText : null,
@@ -141,25 +138,39 @@ export class Sasomange {
           };
         });
 
-        await this.page!.click(
+        let PhoneNumber = await this.page!.click(
           "#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn"
-        );
+        )
+          .then(async () => {
+            await this.page!.waitForTimeout(12000);
 
-        await this.page!.waitForTimeout(12000);
-
-        let PhoneNumber = await this.page!.$eval(
-          "body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a",
-          (el) => {
-            return (el as HTMLElement).innerText;
-          }
-        );
+            let PhoneNumber = await this.page!.$eval(
+              "body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a",
+              (el) => {
+                return (el as HTMLElement).innerText;
+              }
+            );
+            return PhoneNumber;
+          })
+          .catch(() => {
+            console.log("ellement To Click was not Found !!!");
+            return "null";
+          });
 
         GrabData.PhoneNumber = PhoneNumber;
+
         GrabData.article_url = this.Links[i];
 
+        console.log(GrabData);
         this.payload.push(GrabData);
 
-        console.log(GrabData);
+        if (this.payload.length === 20) {
+          this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+
+          let save = await new Save2().wrtieData("sasomange", this.payload);
+
+          this.payload = [];
+        }
       }
     } catch (error) {
       console.log(error);
@@ -175,20 +186,14 @@ export class Sasomange {
     if (this.page !== null) {
       await this.Bulk();
 
-      //await this.SingleAD();
+      await this.SingleAD();
+
+      let save = await new Save2().wrtieData("sasomange", this.payload);
 
       await this.cleanUp();
 
-      console.log(this.Links.length);
-      console.log(this.Links2.size);
-
-      /*       console.log(this.Links.length);
-      console.log(this.payload.length); */
-
       return this.payload;
     } else {
-      //console.log("Browser Failed To Load");
-
       this.Logger.info("Puppeteer Failed To Lunch . ");
 
       return this.payload;

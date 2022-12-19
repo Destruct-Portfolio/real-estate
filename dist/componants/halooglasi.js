@@ -1,4 +1,6 @@
 import puppeteer from "puppeteer";
+import { Save2 } from "../core/save.js";
+import Logger from "../misc/logger.js";
 export class halooglasi {
     payload;
     source;
@@ -6,6 +8,7 @@ export class halooglasi {
     page;
     links;
     Page_Numbers;
+    Logger;
     constructor() {
         this.links = [];
         this.payload = [];
@@ -14,49 +17,43 @@ export class halooglasi {
         this.browser = null;
         this.page = null;
         this.Page_Numbers = 0;
+        this.Logger = new Logger("scrapper", "Hlaouglasi");
     }
     async setup() {
         this.browser = await puppeteer.launch({ headless: true });
         this.page = await this.browser.newPage();
     }
     async Bulk() {
+        this.Logger.info("Grabing AD Link in Mulitple Pages ...");
         await this.page.goto(this.source, {
             waitUntil: "networkidle2",
             timeout: 0,
         });
-        try {
-            let Page_Numbers = await this.page.$eval("#pager-1 > ul > li:nth-child(8) > a", (el) => el.innerHTML);
-            this.Page_Numbers = parseInt(Page_Numbers);
-            console.log(this.Page_Numbers);
-            for (var i = 0; i < this.Page_Numbers; i++) {
-                try {
-                    await this.page.goto(this.source + "&page=" + i, {
-                        waitUntil: "networkidle2",
-                        timeout: 0,
+        let Page_Numbers = await this.page.$eval("#pager-1 > ul > li:nth-child(8) > a", (el) => el.innerHTML).catch(() => {
+            return "20";
+        });
+        this.Page_Numbers = parseInt(Page_Numbers);
+        console.log(this.Page_Numbers);
+        for (var i = 0; i < this.Page_Numbers; i++) {
+            try {
+                await this.page.goto(this.source + "&page=" + i, {
+                    waitUntil: "networkidle2",
+                    timeout: 0,
+                });
+                let PageLinks = await this.page?.$$eval("#ad-list-2 > div.col-md-12", (item) => {
+                    let t = item.map((item) => {
+                        return item.querySelector("a").href;
                     });
-                    let PageLinks = await this.page?.$$eval("#ad-list-2 > div.col-md-12", (item) => {
-                        let t = item.map((item) => {
-                            return item.querySelector("a").href;
-                        });
-                        return t;
-                    });
-                    console.log(PageLinks);
-                    if (PageLinks !== undefined) {
-                        PageLinks.map((url) => {
-                            this.links.push(url);
-                        });
-                    }
-                    else {
-                        this.Page_Numbers = 20;
-                    }
-                }
-                catch (error) {
-                    console.log(error);
-                }
+                    return t;
+                });
+                console.log(PageLinks);
+                PageLinks.map((url) => {
+                    this.links.push(url);
+                });
             }
-        }
-        catch (error) {
-            console.log(error);
+            catch (error) {
+                console.log(error);
+            }
         }
     }
     async singleADD() {
@@ -66,10 +63,17 @@ export class halooglasi {
                     waitUntil: "networkidle2",
                     timeout: 0,
                 });
-                let PhoneNumber = await this.page.click("#plh70 > div > p > span > em");
-                await this.page.waitForTimeout(3000);
-                let Phonenmber2 = await this.page.$eval("#plh70 > a", (el) => {
-                    return el.innerText;
+                let PhoneNumber = await this.page.click("#plh70 > div > p > span > em")
+                    .then(async () => {
+                    await this.page.waitForTimeout(3000);
+                    let Phonenmber2 = await this.page.$eval("#plh70 > a", (el) => {
+                        return el.innerText;
+                    });
+                    return Phonenmber2;
+                })
+                    .catch(() => {
+                    console.log("Phone Number Was Not Found");
+                    return "null";
                 });
                 let ArticleData = await this.page.evaluate(() => {
                     let Rooms = document.querySelector("#plh13");
@@ -95,24 +99,29 @@ export class halooglasi {
                 });
                 ArticleData.article_url = this.links[i];
                 ArticleData.website_source = this.source;
-                ArticleData.PhoneNumber = Phonenmber2;
+                ArticleData.PhoneNumber = PhoneNumber;
                 console.log(ArticleData);
                 this.payload.push(ArticleData);
+                if (this.payload.length === 20) {
+                    this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+                    let save = await new Save2().wrtieData("halou", this.payload);
+                    this.payload = [];
+                }
             }
             catch (error) { }
         }
     }
     async CleenUp() {
+        this.Logger.info("CLosing Down Puppeteer ");
         await this.browser.close();
     }
     async exec() {
         await this.setup();
         if (this.page !== null) {
             await this.Bulk();
-            console.log(this.links.length);
             await this.singleADD();
-            console.log(this.links.length);
-            console.log(this.payload.length);
+            this.Logger.info("Saving Last Elements Loaded ...");
+            await new Save2().wrtieData("halou", this.payload);
             await this.CleenUp();
             return this.payload;
         }
@@ -121,4 +130,4 @@ export class halooglasi {
         }
     }
 }
-// console.log(await new halooglasi().exec());
+console.log(new halooglasi().exec());

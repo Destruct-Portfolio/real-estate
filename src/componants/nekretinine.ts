@@ -4,6 +4,8 @@ import { Ad_Object } from "src/types";
 
 import Logger from "../misc/logger.js";
 
+import { Save2 } from "../core/save.js";
+
 export class Nekretinine {
   private Logger: Logger;
 
@@ -49,9 +51,9 @@ export class Nekretinine {
       timeout: 0,
     });
 
-    for (var i = 1; i < 6; i++) {
+    for (var i = 0; i < 5; i++) {
       try {
-        await this.page!.goto(this.source + "/" + i + "/", {
+        await this.page!.goto(this.source + i, {
           waitUntil: "networkidle2",
 
           timeout: 0,
@@ -74,9 +76,7 @@ export class Nekretinine {
         PageLinks?.map((item) => {
           this.Links.push(item);
         });
-      } catch (error) {
-        /*       console.log(error); */
-      }
+      } catch (error) {}
     }
   }
 
@@ -92,19 +92,19 @@ export class Nekretinine {
         let ArticleData = await this.page!.evaluate(async () => {
           let ImageLinks: string[] = [];
 
-          let price = await document.querySelector(
+          let price = document.querySelector(
             "body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.stickyBox > div.stickyBox__price-size > h4.stickyBox__price"
           );
 
-          let location = await document.querySelector(
+          let location = document.querySelector(
             "#lokacija > div.property__location"
           );
 
-          let Rooms = await document.querySelector(
+          let Rooms = document.querySelector(
             "body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div:nth-child(6) > div > ul > li:nth-child(2) > span"
           );
 
-          let square_meters = await document.querySelector(
+          let square_meters = document.querySelector(
             "body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.stickyBox > div.stickyBox__price-size > h4.stickyBox__size"
           );
 
@@ -141,26 +141,43 @@ export class Nekretinine {
           };
         });
 
-        await this.page!.click(
+        let phoneNumber = await this.page!.click(
           "body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > button"
-        );
+        )
+          .then(async () => {
+            await this.page!?.waitForTimeout(3000);
 
-        await this.page!?.waitForTimeout(3000);
+            let phoneNumber = await this.page!.$eval(
+              "body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > a",
 
-        let phoneNumber = await this.page!.$eval(
-          "body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > a",
-
-          (el) => {
-            return (el as HTMLElement).innerText;
-          }
-        );
+              (el) => {
+                return (el as HTMLElement).innerText;
+              }
+            );
+            return phoneNumber;
+          })
+          .catch(() => {
+            console.log("Phone Number Failed To Load");
+            return "null";
+          });
 
         ArticleData.article_url = this.Links[i];
         ArticleData.website_source = this.source;
         ArticleData.PhoneNumber = phoneNumber;
+
         console.log(ArticleData);
 
         this.payload.push(ArticleData);
+
+        if (this.payload.length === 20) {
+          console.log(this.payload.length);
+
+          this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+
+          let save = await new Save2().wrtieData("nekertine", this.payload);
+
+          this.payload = [];
+        }
       } catch (error) {}
     }
   }
@@ -179,17 +196,15 @@ export class Nekretinine {
 
       await this.CleanUp();
 
-      /*       console.log(this.Links.length);
-
-      console.log(this.payload.length); */
+      this.Logger.info("Saving Last Elements Loaded ... ");
+      await new Save2().wrtieData("nekertine", this.payload);
 
       return this.payload;
     } else {
-      /*    console.log("Puppeteer Failed To lunch"); */
       this.Logger.info("Puppeteer Failed To Lunch . ");
       return this.payload;
     }
   }
 }
 
-//console.log(await new Nekretinine().exec());
+console.log(new Nekretinine().exec());

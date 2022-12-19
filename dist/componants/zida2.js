@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
+import { Save2 } from "../core/save.js";
 export class Zida {
     Logger;
     page;
@@ -8,7 +9,7 @@ export class Zida {
     Links;
     payload;
     constructor() {
-        this.Logger = new Logger("scrapper", "ZIDA");
+        this.Logger = new Logger("scrapper", "Zida");
         this.page = null;
         this.Browser = null;
         this.Links = [];
@@ -22,7 +23,7 @@ export class Zida {
         this.page = await this.Browser.newPage();
     }
     async Bulk() {
-        this.Logger.info("Grabing AD links in Multiple Links ... ");
+        this.Logger.info("Grabing AD links in Multiple Pages ... ");
         for (var i = 1; i < 30; i++) {
             try {
                 await this.page.goto(this.source + i, {
@@ -36,6 +37,8 @@ export class Zida {
                     return t;
                 });
                 console.log(PageLinks);
+                console.log(PageLinks?.length);
+                //this.Links2.add(PageLinks);
                 PageLinks?.map((item) => {
                     this.Links.push(item);
                 });
@@ -50,10 +53,17 @@ export class Zida {
                 waitUntil: "networkidle2",
                 timeout: 0,
             });
-            await this.page.click("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > div:nth-child(1) > div > app-author-info > app-horizontal-info > div > div > div > div > button:nth-child(1)");
-            await this.page.waitForTimeout(2000);
-            let PhoneNumber = await this.page.$eval("#mat-dialog-0 > app-author-phone-dialog > div > mat-dialog-content > section.flex.flex-col.items-center.gap-3 > a > button", (el) => {
-                return el.innerText;
+            let PhoneNumber = await this.page.click("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > div:nth-child(1) > div > app-author-info > app-horizontal-info > div > div > div > div > button:nth-child(1)")
+                .then(async () => {
+                await this.page.waitForTimeout(2000);
+                let PhoneNumber = await this.page.$eval("#mat-dialog-0 > app-author-phone-dialog > div > mat-dialog-content > section.flex.flex-col.items-center.gap-3 > a > button", (el) => {
+                    return el.innerText;
+                });
+                return PhoneNumber;
+            })
+                .catch(() => {
+                console.log("Phone Number Was Not Found");
+                return "Null";
             });
             let articleData = await this.page.evaluate(() => {
                 let price = document.querySelector("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > div:nth-child(1) > div > div > div.flex.flex-1.flex-col.justify-between.gap-4 > div.prices > span");
@@ -83,6 +93,11 @@ export class Zida {
             articleData.article_url = this.Links[i];
             console.log(articleData);
             this.payload.push(articleData);
+            if (this.payload.length === 20) {
+                this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+                let save = await new Save2().wrtieData("zida", this.payload);
+                this.payload = [];
+            }
         }
     }
     async CleanUp() {
@@ -94,6 +109,8 @@ export class Zida {
         if (this.page !== null) {
             await this.Bulk();
             await this.SingleAD();
+            this.Logger.info("Saving Last Elements Loaded ... ");
+            await new Save2().wrtieData("zida", this.payload);
             await this.CleanUp();
             return this.payload;
         }
@@ -103,3 +120,4 @@ export class Zida {
         }
     }
 }
+console.log(await new Zida().exec());

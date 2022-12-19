@@ -1,6 +1,7 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object } from "src/types";
 import Logger from "../misc/logger.js";
+import { Save2 } from "../core/save.js";
 
 export class Zida {
   private Logger: Logger;
@@ -13,11 +14,9 @@ export class Zida {
 
   private Links: string[];
 
-  private Links2: Set<string>;
-
   private payload: Ad_Object[];
   constructor() {
-    this.Logger = new Logger("scrapper", "ZIDA");
+    this.Logger = new Logger("scrapper", "Zida");
 
     this.page = null;
 
@@ -29,8 +28,6 @@ export class Zida {
       "https://www.4zida.rs/prodaja-stanova?lista_fizickih_lica=1&strana=";
 
     this.payload = [];
-
-    this.Links2 = new Set();
   }
 
   private async setup() {
@@ -42,7 +39,7 @@ export class Zida {
   }
 
   private async Bulk() {
-    this.Logger.info("Grabing AD links in Multiple Links ... ");
+    this.Logger.info("Grabing AD links in Multiple Pages ... ");
     for (var i = 1; i < 30; i++) {
       try {
         await this.page!.goto(this.source + i, {
@@ -60,10 +57,11 @@ export class Zida {
           }
         );
         console.log(PageLinks);
+        console.log(PageLinks?.length);
 
+        //this.Links2.add(PageLinks);
         PageLinks?.map((item) => {
           this.Links.push(item);
-          this.Links2.add(item);
         });
       } catch (error) {}
     }
@@ -78,17 +76,24 @@ export class Zida {
         timeout: 0,
       });
 
-      await this.page!.click(
+      let PhoneNumber = await this.page!.click(
         "body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > div:nth-child(1) > div > app-author-info > app-horizontal-info > div > div > div > div > button:nth-child(1)"
-      );
-      await this.page!.waitForTimeout(2000);
+      )
+        .then(async () => {
+          await this.page!.waitForTimeout(2000);
 
-      let PhoneNumber = await this.page!.$eval(
-        "#mat-dialog-0 > app-author-phone-dialog > div > mat-dialog-content > section.flex.flex-col.items-center.gap-3 > a > button",
-        (el) => {
-          return (el as HTMLElement).innerText;
-        }
-      );
+          let PhoneNumber = await this.page!.$eval(
+            "#mat-dialog-0 > app-author-phone-dialog > div > mat-dialog-content > section.flex.flex-col.items-center.gap-3 > a > button",
+            (el) => {
+              return (el as HTMLElement).innerText;
+            }
+          );
+          return PhoneNumber;
+        })
+        .catch(() => {
+          console.log("Phone Number Was Not Found");
+          return "Null";
+        });
 
       let articleData = await this.page!.evaluate(() => {
         let price = document.querySelector(
@@ -143,6 +148,14 @@ export class Zida {
       console.log(articleData);
 
       this.payload.push(articleData);
+
+      if (this.payload.length === 20) {
+        this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+
+        let save = await new Save2().wrtieData("zida", this.payload);
+
+        this.payload = [];
+      }
     }
   }
 
@@ -156,17 +169,20 @@ export class Zida {
     await this.setup();
     if (this.page !== null) {
       await this.Bulk();
-      //await this.SingleAD();
+
+      await this.SingleAD();
+
+      this.Logger.info("Saving Last Elements Loaded ... ");
+      await new Save2().wrtieData("zida", this.payload);
+
       await this.CleanUp();
-      console.log(this.Links.length);
-      console.log(this.Links2.size);
+
       return this.payload;
     } else {
       this.Logger.info("Puppeteer Failed To Lunch . ");
-
       return this.payload;
     }
   }
 }
 
-console.log(new Zida().exec());
+console.log(await new Zida().exec());

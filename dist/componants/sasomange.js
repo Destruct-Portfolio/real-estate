@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
+import { Save2 } from "../core/save.js";
 export class Sasomange {
     page;
     Browser;
@@ -12,14 +13,9 @@ export class Sasomange {
         this.page = null;
         this.Browser = null;
         this.payload = [];
-        this.Links = [
-        //"https://sasomange.rs/p/130484487/vrsac-na-prodaju-dvoiposoban-stan",
-        /*       "https://sasomange.rs/p/121409123/prodajem-stan-u-valjevu",
-        "https://sasomange.rs/p/133124313/1-5-stan-famaceutski-fakultet",
-        "https://sasomange.rs/p/133119342/stan-79m2-loznica", */
-        ];
+        this.Links = [];
         this.source =
-            "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik";
+            "https://sasomange.rs/c/stanovi-prodaja/f/beograd?productsFacets.facets=status%3AACTIVE%2Cflat_advertiser_to_sale%3AVlasnik";
     }
     async setup() {
         this.Logger.info("Puppeteer launching ... ");
@@ -36,11 +32,9 @@ export class Sasomange {
         await this.page.waitForTimeout(2000);
         await this.page.click("#CybotCookiebotDialogBodyButtonAccept");
         await this.page.waitForTimeout(10000);
-        for (var i = 1; i < 34; i++) {
+        for (var i = 1; i < 12; i++) {
             try {
-                await this.page.goto("https://sasomange.rs/c/stanovi-prodaja?currentPage=" +
-                    i +
-                    "&productsFacets.facets=flat_advertiser_to_sale%3AVlasnik", { waitUntil: "networkidle2", timeout: 0 });
+                await this.page.goto(`https://sasomange.rs/c/stanovi-prodaja/f/beograd?currentPage=${i}&productsFacets.facets=flat_advertiser_to_sale%3AVlasnik`, { waitUntil: "networkidle2", timeout: 0 });
                 console.log(this.page.url());
                 let PageLinks = await this.page?.$$eval("#plpPage > div:nth-child(3) > section > section > section > div.mobile-view.d-sm-none > section:nth-child(5) > ul.grid-view.js-grid-view-item > li.product-single-item", (item) => {
                     let t = item.map((item) => {
@@ -80,7 +74,7 @@ export class Sasomange {
                         property_price: price ? price.innerText : null,
                         square_meters: m2 ? m2.innerText : null,
                         property_location: location
-                            ? location.innerText
+                            ? location.innerText.split("\n").join(" ")
                             : null,
                         Number_Of_Rooms: rooms ? rooms.innerText : null,
                         property_pictures: IgLinks,
@@ -89,15 +83,27 @@ export class Sasomange {
                         article_url: "",
                     };
                 });
-                await this.page.click("#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn");
-                await this.page.waitForTimeout(12000);
-                let PhoneNumber = await this.page.$eval("body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a", (el) => {
-                    return el.innerText;
+                let PhoneNumber = await this.page.click("#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn")
+                    .then(async () => {
+                    await this.page.waitForTimeout(12000);
+                    let PhoneNumber = await this.page.$eval("body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a", (el) => {
+                        return el.innerText;
+                    });
+                    return PhoneNumber;
+                })
+                    .catch(() => {
+                    console.log("ellement To Click was not Found !!!");
+                    return "null";
                 });
                 GrabData.PhoneNumber = PhoneNumber;
                 GrabData.article_url = this.Links[i];
-                this.payload.push(GrabData);
                 console.log(GrabData);
+                this.payload.push(GrabData);
+                if (this.payload.length === 20) {
+                    this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+                    let save = await new Save2().wrtieData("sasomange", this.payload);
+                    this.payload = [];
+                }
             }
         }
         catch (error) {
@@ -113,13 +119,11 @@ export class Sasomange {
         if (this.page !== null) {
             await this.Bulk();
             await this.SingleAD();
+            let save = await new Save2().wrtieData("sasomange", this.payload);
             await this.cleanUp();
-            /*       console.log(this.Links.length);
-            console.log(this.payload.length); */
             return this.payload;
         }
         else {
-            //console.log("Browser Failed To Load");
             this.Logger.info("Puppeteer Failed To Lunch . ");
             return this.payload;
         }

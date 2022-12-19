@@ -1,69 +1,18 @@
 import fs from "fs";
-import lodash from "lodash";
 import Logger from "../misc/logger.js";
-export class Saver {
-    logger;
-    path;
-    payload;
-    old_data;
-    constructor(payload, FileName) {
-        this.path = "../data/" + FileName + ".json";
-        this.payload = payload;
-        this.old_data = [];
-        this.logger = new Logger("Saver", "saver");
-    }
-    async pull_Data() {
-        this.logger.info("Pulling the Old Data . . .");
-        try {
-            const data = await fs.readFileSync(this.path).toString();
-            this.old_data = JSON.parse(data);
+export class Save2 {
+    path = "../data/";
+    Logger = new Logger("Saver", "Saver");
+    async wrtieData(FileName, Ads) {
+        this.Logger.info(`Saving ${Ads.length} Ads to ${FileName} ... `);
+        let Load_File = await JSON.parse(fs.readFileSync(this.path + FileName + ".json").toString());
+        this.Logger.info("Verifying if there is Duplicates Between the old and the new data ...");
+        for (let index = 0; index < Ads.length; index++) {
+            if (!Load_File.some((item) => item.article_url === Ads[index].article_url))
+                Load_File.push(Ads[index]);
         }
-        catch (error) {
-            this.logger.info("Failed To Read File ads.json . . .");
-            this.old_data = [];
-        }
-    }
-    async compareData() {
-        this.logger.info("Comparing News ads with old ads . . .");
-        let diff = lodash.isEqual(this.old_data, this.payload);
-        return diff;
-    }
-    async WriteData() {
-        this.logger.info("Writing The New Ads in JSON . . . ");
-        try {
-            fs.writeFileSync(this.path, JSON.stringify(this.payload));
-        }
-        catch (error) {
-            this.logger.error("Failed To write News ADS :: ==>");
-            console.log(error);
-        }
-    }
-    async exec() {
-        this.logger.info("Saving Data Process Starting ...");
-        await this.pull_Data();
-        let diff = await this.compareData();
-        if (diff === true) {
-            this.logger.info("No New ADS . . .");
-            console.log("there is no Diff");
-        }
-        else {
-            this.logger.info("Found New Ads . . .");
-            await this.WriteData();
-        }
+        this.Logger.info("Saving the New Data into the File");
+        fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(Load_File));
+        return;
     }
 }
-/* let Payload: Ad_Object[] = [
-  {
-    Number_Of_Rooms: "string",
-    square_meters: "stringggg",
-    property_location: "string",
-    property_price: "string",
-    article_url: "string",
-    website_source: "string",
-    property_pictures: ["string", "feahjfl"],
-    PhoneNumber: "string",
-  },
-];
-
-console.log(await new Saver(Payload, "neko").exec());
- */

@@ -28,7 +28,7 @@ export class Nekretinine {
             waitUntil: "networkidle2",
             timeout: 0,
         });
-        for (var i = 1; i < 5; i++) {
+        for (var i = 0; i < 5; i++) {
             try {
                 await this.page.goto(this.source + i, {
                     waitUntil: "networkidle2",

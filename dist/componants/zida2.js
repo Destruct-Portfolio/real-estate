@@ -1,6 +1,8 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
-import { Save2 } from "../core/save.js";
+import axios from "axios";
+import fs from "node:fs";
+let API_URL = 'https://api.4zida.rs/v6/eds/6325e7a260196a1e2904781c';
 export class Zida {
     Logger;
     page;
@@ -12,7 +14,7 @@ export class Zida {
         this.Logger = new Logger("scrapper", "Zida");
         this.page = null;
         this.Browser = null;
-        this.Links = [];
+        this.Links = ["https://www.4zida.rs/prodaja/stanovi/novi-sad/oglas/zlatariceva-24/6325e7a260196a1e2904781c"];
         this.source =
             "https://www.4zida.rs/prodaja-stanova?lista_fizickih_lica=1&strana=";
         this.payload = [];
@@ -24,7 +26,7 @@ export class Zida {
     }
     async Bulk() {
         this.Logger.info("Grabing AD links in Multiple Pages ... ");
-        for (var i = 1; i < 30; i++) {
+        for (var i = 1; i < 5; i++) {
             try {
                 await this.page.goto(this.source + i, {
                     waitUntil: "networkidle2",
@@ -37,8 +39,7 @@ export class Zida {
                     return t;
                 });
                 console.log(PageLinks);
-                console.log(PageLinks?.length);
-                //this.Links2.add(PageLinks);
+                console.log(`[<<] Links collected from ${this.source + i} :: ${PageLinks?.length} Link`);
                 PageLinks?.map((item) => {
                     this.Links.push(item);
                 });
@@ -53,50 +54,40 @@ export class Zida {
                 waitUntil: "networkidle2",
                 timeout: 0,
             });
-            let PhoneNumber = await this.page.click("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > div:nth-child(1) > div > app-author-info > app-horizontal-info > div > div > div > div > button:nth-child(1)")
-                .then(async () => {
-                await this.page.waitForTimeout(2000);
-                let PhoneNumber = await this.page.$eval("#mat-dialog-0 > app-author-phone-dialog > div > mat-dialog-content > section.flex.flex-col.items-center.gap-3 > a > button", (el) => {
-                    return el.innerText;
+            try {
+                let WebsiteID = this.Links[i].split('/');
+                let RequestPhoneNumber = await axios.get(`https://api.4zida.rs/v6/eds/${WebsiteID[WebsiteID.length - 1]}`);
+                let response = RequestPhoneNumber.data;
+                let PhoneNumber = response.author.phones[0].national;
+                let Price = response.price ? response.price.toString() : null;
+                let meter = response.area ? response.area : null;
+                let images = response.images ? response.images.map((item) => {
+                    return item.adDetails["1920x1080_fit_0_jpeg"];
+                }) : null;
+                let property_location = response.safeAddress + ' ' + response.placeIdsAndTitles.map((item) => {
+                    return item.title;
+                }).join(' ');
+                let articleData = await this.page.evaluate(() => {
+                    let Number_Of_Rooms = document.querySelector("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > app-info-item:nth-child(7) > div > strong");
+                    return {
+                        Number_Of_Rooms: Number_Of_Rooms
+                            ? Number_Of_Rooms.innerText
+                            : null,
+                    };
                 });
-                return PhoneNumber;
-            })
-                .catch(() => {
-                console.log("Phone Number Was Not Found");
-                return "Null";
-            });
-            let articleData = await this.page.evaluate(() => {
-                let price = document.querySelector("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > div:nth-child(1) > div > div > div.flex.flex-1.flex-col.justify-between.gap-4 > div.prices > span");
-                let Number_Of_Rooms = document.querySelector("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > app-info-item:nth-child(7) > div > strong");
-                let meter = document.querySelector("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > app-info-item:nth-child(6) > div > strong");
-                let property_location = document.querySelector("body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > div:nth-child(1) > div > div > div.flex.flex-1.flex-col.justify-between.gap-4 > app-place-info > div");
-                let Images = Array.from(document.querySelectorAll("#preview-gallery-image-sm")).map((item) => {
-                    return item.src;
+                this.payload.push({
+                    property_location: property_location,
+                    Number_Of_Rooms: articleData.Number_Of_Rooms,
+                    square_meters: meter,
+                    property_price: Price,
+                    article_url: this.Links[i],
+                    website_source: this.source,
+                    property_pictures: images,
+                    PhoneNumber: PhoneNumber
                 });
-                return {
-                    Number_Of_Rooms: Number_Of_Rooms
-                        ? Number_Of_Rooms.innerText
-                        : null,
-                    square_meters: meter ? meter.innerText : null,
-                    property_location: property_location
-                        ? property_location.innerText
-                        : null,
-                    property_price: price ? price.innerText : null,
-                    article_url: "",
-                    website_source: "",
-                    property_pictures: Image ? Images : [],
-                    PhoneNumber: "",
-                };
-            });
-            articleData.PhoneNumber = PhoneNumber;
-            articleData.website_source = this.source;
-            articleData.article_url = this.Links[i];
-            console.log(articleData);
-            this.payload.push(articleData);
-            if (this.payload.length === 20) {
-                this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
-                let save = await new Save2().wrtieData("zida", this.payload);
-                this.payload = [];
+            }
+            catch (error) {
+                console.log(error);
             }
         }
     }
@@ -107,11 +98,10 @@ export class Zida {
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            await this.Bulk();
+            // await this.Bulk();
             await this.SingleAD();
-            this.Logger.info("Saving Last Elements Loaded ... ");
-            await new Save2().wrtieData("zida", this.payload);
             await this.CleanUp();
+            fs.writeFileSync('../../data/test.json', JSON.stringify(this.payload));
             return this.payload;
         }
         else {

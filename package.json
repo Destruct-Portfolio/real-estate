@@ -15,6 +15,7 @@
     "@types/puppeteer": "^7.0.4",
     "@ulixee/hero": "^2.0.0-alpha.12",
     "@ulixee/server": "^2.0.0-alpha.12",
+    "axios": "^1.2.1",
     "dotenv": "^16.0.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",

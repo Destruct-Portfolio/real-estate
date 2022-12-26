@@ -1,0 +1,15 @@
+name: Zida
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install npm
+        run: npm install
+      - name: Run roll
+        run: npm run roll componants/zida2

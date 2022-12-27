@@ -70,34 +70,42 @@ class Nekretinine {
             ArticleData.PhoneNumber = phoneNumber;
             let check_things = Object.values(ArticleData).every(value => value != null);
             console.log(check_things);
-            if (check_things)
+            if (check_things) {
                 return ArticleData;
-            attemempts++;
-            return null;
+            }
+            else {
+                attemempts++;
+            }
         }
     }
     async Script() {
         await this.setup();
         let Payload = [];
-        for (var i = 1; i <= 1; i++) {
-            //goes to Page
-            await this.client.goto("https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/" + i, { timeout: 0, waitUntil: "networkidle2" });
-            //Collect ALL THE LINK
-            let PageLinks = await this.client?.$$eval("div.row.offer", (item) => {
-                let t = item.map((item) => {
-                    return item.querySelector("a").href;
+        for (var i = 1; i <= 5; i++) {
+            try {
+                //goes to Page
+                await this.client.goto("https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/" + i, { timeout: 0, waitUntil: "networkidle2" });
+                //Collect ALL THE LINK
+                let PageLinks = await this.client?.$$eval("div.row.offer", (item) => {
+                    let t = item.map((item) => {
+                        return item.querySelector("a").href;
+                    });
+                    return t;
                 });
-                return t;
-            });
-            console.log(PageLinks);
-            if (PageLinks !== undefined) {
-                for (var ADLINK = 0; ADLINK < PageLinks.length; ADLINK++) {
-                    console.log(`Proccessing this ${PageLinks[ADLINK]}`);
-                    let ADOBJECT = await this.ScrapeADLINK(PageLinks[ADLINK]);
-                    console.log(ADOBJECT);
-                    if (ADOBJECT !== null)
-                        Payload.push(ADOBJECT);
+                console.log(PageLinks);
+                if (PageLinks !== undefined) {
+                    for (var ADLINK = 0; ADLINK < PageLinks.length; ADLINK++) {
+                        console.log(`Proccessing this ${PageLinks[ADLINK]}`);
+                        let ADOBJECT = await this.ScrapeADLINK(PageLinks[ADLINK]);
+                        console.log(ADOBJECT);
+                        if (ADOBJECT !== undefined)
+                            Payload.push(ADOBJECT);
+                    }
                 }
+            }
+            catch (error) {
+                console.log("Failed To Load  :: " + "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/" + i);
+                i--;
             }
         }
         fs.writeFileSync('../data/nek2.json', JSON.stringify(Payload));

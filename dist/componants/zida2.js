@@ -28,7 +28,7 @@ export class Zida {
     }
     async Bulk() {
         this.Logger.info("Grabing AD links in Multiple Pages ... ");
-        for (var i = 1; i <= 41; i++) {
+        for (var i = 1; i <= 30; i++) {
             try {
                 await this.page.goto(this.source + i, {
                     waitUntil: "networkidle2",

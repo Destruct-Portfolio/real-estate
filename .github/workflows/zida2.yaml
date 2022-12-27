@@ -12,7 +12,7 @@ jobs:
       - name: Install npm
         run: npm install
       - name: Run roll
-        run: npm run roll componants/zida2
+        run: npm run roll componants/nekretinine
       - name: Save the generated files
         if: always()
         uses: stefanzweifel/git-auto-commit-action@v4

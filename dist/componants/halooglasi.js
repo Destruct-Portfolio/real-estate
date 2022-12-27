@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
-import { Save2 } from "../core/save.js";
 import Logger from "../misc/logger.js";
+import fs from "fs";
 export class halooglasi {
     payload;
     source;
@@ -10,7 +10,9 @@ export class halooglasi {
     Page_Numbers;
     Logger;
     constructor() {
-        this.links = [];
+        this.links = [
+            "https://www.halooglasi.com/nekretnine/prodaja-stanova/renoviran-uknjizen-odmah-useljiv/5425642668237?kid=4&sid=1672134545166"
+        ];
         this.payload = [];
         this.source =
             "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
@@ -78,7 +80,9 @@ export class halooglasi {
                 let ArticleData = await this.page.evaluate(() => {
                     let Rooms = document.querySelector("#plh13");
                     let meter = document.querySelector("#plh12");
-                    let location = document.querySelector("#plh3");
+                    let location1 = document.querySelector("#plh3");
+                    let location2 = document.querySelector('#plh4');
+                    let location3 = document.querySelector('#plh5');
                     let price = document.querySelector("#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail");
                     let images = Array.from(document.querySelectorAll("#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img")).map((item) => {
                         console.log(item.src);
@@ -87,9 +91,9 @@ export class halooglasi {
                     return {
                         Number_Of_Rooms: Rooms ? Rooms.innerText : null,
                         square_meters: meter ? meter.innerText : null,
-                        property_location: location
-                            ? location.innerText
-                            : null,
+                        property_location: location1
+                            ? location1.innerText
+                            : null + ' ' + location2 ? location2.innerText : null + " " + location3 ? location3.innerHTML : null,
                         property_price: price ? price.innerText : null,
                         article_url: "",
                         website_source: "",
@@ -102,11 +106,13 @@ export class halooglasi {
                 ArticleData.PhoneNumber = PhoneNumber;
                 console.log(ArticleData);
                 this.payload.push(ArticleData);
-                if (this.payload.length === 20) {
-                    this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
-                    let save = await new Save2().wrtieData("halou", this.payload);
-                    this.payload = [];
-                }
+                /*         if (this.payload.length === 20) {
+                          this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+                
+                          let save = await new Save2().wrtieData("halou", this.payload);
+                
+                          this.payload = [];
+                        } */
             }
             catch (error) { }
         }
@@ -118,11 +124,13 @@ export class halooglasi {
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            await this.Bulk();
+            //  await this.Bulk();
             await this.singleADD();
-            this.Logger.info("Saving Last Elements Loaded ...");
-            await new Save2().wrtieData("halou", this.payload);
+            /*this.Logger.info("Saving Last Elements Loaded ...");
+            await new Save2().wrtieData("halou", this.payload); */
             await this.CleenUp();
+            console.log(this.payload.length);
+            fs.writeFileSync('../data/halou2.json', JSON.stringify(this.payload));
             return this.payload;
         }
         else {

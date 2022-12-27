@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
-import { Save2 } from "../core/save.js";
+import fs from "fs";
 export class Nekretinine {
     Logger;
     browser;
@@ -12,7 +12,9 @@ export class Nekretinine {
         this.browser = null;
         this.page = null;
         this.Logger = new Logger("scrapper", "Nekretinine");
-        this.Links = [];
+        this.Links = [
+            "https://www.nekretnine.rs/stambeni-objekti/stanovi/kotez-stanovi-34-40-5-41-i-43-kvadrata-uknjizeni/NkK-RXy7mlH/"
+        ];
         this.source =
             "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/";
         this.payload = [];
@@ -106,14 +108,21 @@ export class Nekretinine {
                 ArticleData.PhoneNumber = phoneNumber;
                 console.log(ArticleData);
                 this.payload.push(ArticleData);
-                if (this.payload.length === 20) {
-                    console.log(this.payload.length);
-                    this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
-                    let save = await new Save2().wrtieData("nekertine", this.payload);
-                    this.payload = [];
-                }
+                /*     if (this.payload.length === 20) {
+                
+                      console.log(this.payload.length);
+            
+                      this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+            
+                      let save = await new Save2().wrtieData("nekertine", this.payload);
+            
+                      this.payload = [];
+                    
+                } */
             }
-            catch (error) { }
+            catch (error) {
+                console.log(error);
+            }
         }
     }
     async CleanUp() {
@@ -123,11 +132,10 @@ export class Nekretinine {
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            await this.Collect_Links();
+            // await this.Collect_Links();
             await this.SingleAD();
             await this.CleanUp();
-            this.Logger.info("Saving Last Elements Loaded ... ");
-            await new Save2().wrtieData("nekertine", this.payload);
+            fs.writeFileSync('../data/nek2.json', JSON.stringify(this.payload));
             return this.payload;
         }
         else {
@@ -136,4 +144,4 @@ export class Nekretinine {
         }
     }
 }
-console.log(new Nekretinine().exec());
+console.log(await new Nekretinine().exec());

@@ -6,7 +6,10 @@ import Logger from "../misc/logger.js";
 
 import { Save2 } from "../core/save.js";
 
+import fs from "fs"
+
 export class Nekretinine {
+
   private Logger: Logger;
 
   private browser: Browser | null;
@@ -107,6 +110,7 @@ export class Nekretinine {
           );
 
           let T = document.querySelector("#top");
+
           let Gal = Array.from(T!.querySelectorAll("picture"));
           Gal.map((item) => {
             let link = item.querySelector("source")?.srcset;
@@ -167,16 +171,22 @@ export class Nekretinine {
 
         this.payload.push(ArticleData);
 
-        if (this.payload.length === 20) {
-          console.log(this.payload.length);
+        /*     if (this.payload.length === 20) {
+        
+              console.log(this.payload.length);
+    
+              this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
+    
+              let save = await new Save2().wrtieData("nekertine", this.payload);
+    
+              this.payload = [];
+            
+        } */
 
-          this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
 
-          let save = await new Save2().wrtieData("nekertine", this.payload);
-
-          this.payload = [];
-        }
-      } catch (error) { }
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 
@@ -188,18 +198,17 @@ export class Nekretinine {
     await this.setup();
 
     if (this.page !== null) {
+
       await this.Collect_Links();
-
       await this.SingleAD();
-
       await this.CleanUp();
-
-      this.Logger.info("Saving Last Elements Loaded ... ");
-      await new Save2().wrtieData("nekertine", this.payload);
+      fs.writeFileSync('../data/nek2.json', JSON.stringify(this.payload))
 
       return this.payload;
     } else {
+
       this.Logger.info("Puppeteer Failed To Lunch . ");
+
       return this.payload;
     }
   }

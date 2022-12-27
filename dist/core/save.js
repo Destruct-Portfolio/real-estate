@@ -16,3 +16,29 @@ export class Save2 {
         return;
     }
 }
+class ObjectList {
+    objects;
+    constructor(filePath) {
+        this.objects = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    }
+    compareList(newObjects) {
+        const difference = [];
+        for (const newObject of newObjects) {
+            if (!this.objects.includes(newObject)) {
+                difference.push(newObject);
+            }
+        }
+        return difference;
+    }
+}
+/* const objectList = new ObjectList('/path/to/file.json');
+const newObjects = [{ id: 1, name: 'Item 1' }, { id: 2, name: 'Item 2' }];
+const difference = objectList.compareList(newObjects);
+
+console.log(difference); */
+/*
+// Output:
+[
+  { id: 1, name: 'Item 1' },
+  { id: 2, name: 'Item 2' }
+] */ 

@@ -48,11 +48,11 @@ class ObjectList {
   }
 }
 
-const objectList = new ObjectList('/path/to/file.json');
+/* const objectList = new ObjectList('/path/to/file.json');
 const newObjects = [{ id: 1, name: 'Item 1' }, { id: 2, name: 'Item 2' }];
 const difference = objectList.compareList(newObjects);
 
-console.log(difference);
+console.log(difference); */
 /*
 // Output:
 [

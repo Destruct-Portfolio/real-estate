@@ -12,6 +12,7 @@ jobs:
       - name: Install npm
         run: npm install
       - name: Run roll
+        timeout-minutes: 2880
         run: npm run roll componants/nekretinine
       - name: Save the generated files
         if: always()

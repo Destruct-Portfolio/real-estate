@@ -1,6 +1,6 @@
 1.[DONE] The only issue I've noticed on 4zida is that the phone numbers are not getting scraped,
 
-2.[WORKING_ON_IT]\_[Re_DO]Nekretnine has a more serious problem.
+2.[TESTING]\_[Re_DO]Nekretnine has a more serious problem.
 Many ads are not getting scraped properly. Null data type is present too many times in scraped data
 
 3. [TWO-PARTS]

@@ -117,11 +117,11 @@ class Nekretinine {
 
             console.log(check_things)
 
-            if (check_things) return ArticleData
-
-            attemempts++
-
-            return null
+            if (check_things) {
+                return ArticleData
+            } else {
+                attemempts++
+            }
         }
     }
 
@@ -153,7 +153,7 @@ class Nekretinine {
                         console.log(`Proccessing this ${PageLinks[ADLINK]}`)
                         let ADOBJECT = await this.ScrapeADLINK(PageLinks[ADLINK])
                         console.log(ADOBJECT)
-                        if (ADOBJECT !== null) Payload.push(ADOBJECT!)
+                        if (ADOBJECT !== undefined) Payload.push(ADOBJECT!)
                     }
                 }
 

@@ -12,9 +12,7 @@ export class Nekretinine {
         this.browser = null;
         this.page = null;
         this.Logger = new Logger("scrapper", "Nekretinine");
-        this.Links = [
-            "https://www.nekretnine.rs/stambeni-objekti/stanovi/kotez-stanovi-34-40-5-41-i-43-kvadrata-uknjizeni/NkK-RXy7mlH/"
-        ];
+        this.Links = [];
         this.source =
             "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/";
         this.payload = [];
@@ -132,7 +130,7 @@ export class Nekretinine {
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            // await this.Collect_Links();
+            await this.Collect_Links();
             await this.SingleAD();
             await this.CleanUp();
             fs.writeFileSync('../data/nek2.json', JSON.stringify(this.payload));

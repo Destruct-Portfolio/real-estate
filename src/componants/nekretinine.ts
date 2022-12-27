@@ -44,14 +44,12 @@ export class Nekretinine {
 
   private async Collect_Links() {
     this.Logger.info("Grabing AD links in Multiple Links ... ");
-
     await this.page!.goto(this.source, {
       waitUntil: "networkidle2",
-
       timeout: 0,
     });
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i <= 5; i++) {
       try {
         await this.page!.goto(this.source + i, {
           waitUntil: "networkidle2",
@@ -76,7 +74,7 @@ export class Nekretinine {
         PageLinks?.map((item) => {
           this.Links.push(item);
         });
-      } catch (error) {}
+      } catch (error) { }
     }
   }
 
@@ -178,7 +176,7 @@ export class Nekretinine {
 
           this.payload = [];
         }
-      } catch (error) {}
+      } catch (error) { }
     }
   }
 
@@ -207,4 +205,4 @@ export class Nekretinine {
   }
 }
 
-console.log(new Nekretinine().exec());
+console.log(await new Nekretinine().exec());

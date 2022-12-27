@@ -1,9 +1,10 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
+//import { Save2 } from "../core/save.js";
 import axios from "axios";
 import fs from "node:fs";
 // need to FIX THE PAGES IN THIS BITCH 
-let API_URL = 'https://api.4zida.rs/v6/eds/6325e7a260196a1e2904781c';
+//let API_URL = 'https://api.4zida.rs/v6/eds/6325e7a260196a1e2904781c'
 export class Zida {
     Logger;
     page;
@@ -15,7 +16,7 @@ export class Zida {
         this.Logger = new Logger("scrapper", "Zida");
         this.page = null;
         this.Browser = null;
-        this.Links = ["https://www.4zida.rs/prodaja/stanovi/novi-sad/oglas/bulevar-evrope/639f1babffeb18ffde0e0594"];
+        this.Links = [];
         this.source =
             "https://www.4zida.rs/prodaja-stanova?lista_fizickih_lica=1&strana=";
         this.payload = [];
@@ -27,7 +28,7 @@ export class Zida {
     }
     async Bulk() {
         this.Logger.info("Grabing AD links in Multiple Pages ... ");
-        for (var i = 1; i < 41; i++) {
+        for (var i = 1; i <= 41; i++) {
             try {
                 await this.page.goto(this.source + i, {
                     waitUntil: "networkidle2",
@@ -109,7 +110,7 @@ export class Zida {
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            //      await this.Bulk();
+            await this.Bulk();
             await this.SingleAD();
             await this.CleanUp();
             fs.writeFileSync('../data/zida.json', JSON.stringify(this.payload));

@@ -23,7 +23,7 @@ class Nekretinine {
     private async ScrapeADLINK(Link: string) {
         let attemempts = 0;
 
-        while (attemempts <= 3) {
+        while (attemempts <= 5) {
 
             await this.client!.goto(Link, {
                 waitUntil: "networkidle2",

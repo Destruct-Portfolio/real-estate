@@ -157,14 +157,6 @@ export class halooglasi {
 
         this.payload.push(ArticleData);
 
-        /*         if (this.payload.length === 20) {
-                  this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
-        
-                  let save = await new Save2().wrtieData("halou", this.payload);
-        
-                  this.payload = [];
-                } */
-
       } catch (error) { }
     }
   }
@@ -177,12 +169,9 @@ export class halooglasi {
   public async exec() {
     await this.setup();
     if (this.page !== null) {
-      //  await this.Bulk();
+      await this.Bulk();
 
       await this.singleADD();
-
-      /*this.Logger.info("Saving Last Elements Loaded ...");
-      await new Save2().wrtieData("halou", this.payload); */
 
       await this.CleenUp();
 

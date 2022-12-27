@@ -2,6 +2,7 @@ import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
 import axios from "axios";
 import fs from "node:fs";
+// need to FIX THE PAGES IN THIS BITCH 
 let API_URL = 'https://api.4zida.rs/v6/eds/6325e7a260196a1e2904781c';
 export class Zida {
     Logger;
@@ -14,7 +15,7 @@ export class Zida {
         this.Logger = new Logger("scrapper", "Zida");
         this.page = null;
         this.Browser = null;
-        this.Links = ["https://www.4zida.rs/prodaja/stanovi/novi-sad/oglas/zlatariceva-24/6325e7a260196a1e2904781c"];
+        this.Links = [];
         this.source =
             "https://www.4zida.rs/prodaja-stanova?lista_fizickih_lica=1&strana=";
         this.payload = [];
@@ -39,7 +40,7 @@ export class Zida {
                     return t;
                 });
                 console.log(PageLinks);
-                console.log(`[<<] Links collected from ${this.source + i} :: ${PageLinks?.length} Link`);
+                console.log(`[<<] Page ${this.source + i} collected ${PageLinks?.length} Link`);
                 PageLinks?.map((item) => {
                     this.Links.push(item);
                 });
@@ -75,6 +76,16 @@ export class Zida {
                             : null,
                     };
                 });
+                console.log({
+                    property_location: property_location,
+                    Number_Of_Rooms: articleData.Number_Of_Rooms,
+                    square_meters: meter,
+                    property_price: Price,
+                    article_url: this.Links[i],
+                    website_source: this.source,
+                    property_pictures: images,
+                    PhoneNumber: PhoneNumber
+                });
                 this.payload.push({
                     property_location: property_location,
                     Number_Of_Rooms: articleData.Number_Of_Rooms,
@@ -98,10 +109,10 @@ export class Zida {
     async exec() {
         await this.setup();
         if (this.page !== null) {
-            // await this.Bulk();
+            await this.Bulk();
             await this.SingleAD();
             await this.CleanUp();
-            fs.writeFileSync('../../data/test.json', JSON.stringify(this.payload));
+            fs.writeFileSync('./test.json', JSON.stringify(this.payload));
             return this.payload;
         }
         else {

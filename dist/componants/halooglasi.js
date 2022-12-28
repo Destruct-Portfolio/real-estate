@@ -122,11 +122,10 @@ export class halooglasi {
         await this.setup();
         if (this.page !== null) {
             await this.Bulk();
-            console.log(this.links);
-            // await this.singleADD();
+            await this.singleADD();
             await this.CleenUp();
             console.log(this.payload.length);
-            fs.writeFileSync('../data/halou2.json', JSON.stringify(this.payload));
+            fs.writeFileSync('../data/halou_updated.json', JSON.stringify(this.payload));
             return this.payload;
         }
         else {

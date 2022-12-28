@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
+import fs from "fs";
 export class Sasomange {
     page;
     Browser;
@@ -116,6 +117,7 @@ export class Sasomange {
             await this.Bulk();
             await this.SingleAD();
             await this.cleanUp();
+            fs.writeFileSync('../data/sas_updated.json', JSON.stringify(this.payload));
             return this.payload;
         }
         else {

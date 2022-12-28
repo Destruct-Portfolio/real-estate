@@ -138,7 +138,7 @@ export class Nekretinine {
             article_url: "",
             website_source: "",
             property_pictures: ImageLinks ? ImageLinks : [],
-
+            id: "",
             PhoneNumber: "",
           };
         });
@@ -166,7 +166,7 @@ export class Nekretinine {
         ArticleData.article_url = this.Links[i];
         ArticleData.website_source = this.source;
         ArticleData.PhoneNumber = phoneNumber;
-
+        ArticleData.id = ""
         console.log(ArticleData);
 
         this.payload.push(ArticleData);

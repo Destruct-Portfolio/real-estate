@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
 import fs from "fs";
-export class Nekretinine {
+export default class Nekretinine {
     Logger;
     browser;
     page;

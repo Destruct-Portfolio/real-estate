@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import fs from "node:fs";
 //Need to Create a check to see if the any of the values scrappped are null 
-class Nekretinine {
+export default class Nekretinine_updated {
     client;
     Browser;
     constructor() {
@@ -80,7 +80,7 @@ class Nekretinine {
             }
         }
     }
-    async Script() {
+    async exec() {
         await this.setup();
         let Payload = [];
         for (var i = 1; i <= 5; i++) {
@@ -114,4 +114,4 @@ class Nekretinine {
         return Payload;
     }
 }
-console.log(await new Nekretinine().Script());
+console.log(await new Nekretinine_updated().exec());

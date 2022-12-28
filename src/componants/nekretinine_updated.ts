@@ -1,6 +1,6 @@
 import puppeteer, { Page, Browser } from "puppeteer"
 import { Ad_Object } from "src/types"
-import fs from "node:fs"
+import fs, { link } from "node:fs"
 
 
 //Need to Create a check to see if the any of the values scrappped are null 
@@ -84,6 +84,7 @@ class Nekretinine {
                     property_pictures: ImageLinks ? ImageLinks : [],
 
                     PhoneNumber: "",
+                    id: ""
                 };
             });
 
@@ -109,9 +110,11 @@ class Nekretinine {
 
             ArticleData.article_url = Link;
 
-            ArticleData.website_source = "";
+            ArticleData.website_source = "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/";
 
             ArticleData.PhoneNumber = phoneNumber;
+
+            ArticleData.id = Link.split('/')[Link.split('/').length - 2]
 
             let check_things = Object.values(ArticleData).every(value => value != null);
 

@@ -1,6 +1,5 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object } from "src/types";
-import { Save2 } from "../core/save.js";
 import Logger from "../misc/logger.js";
 import fs from "fs"
 
@@ -146,12 +145,18 @@ export class halooglasi {
             property_pictures: images ? images : null,
 
             PhoneNumber: "",
+
+            id: ""
+
           };
         });
 
         ArticleData.article_url = this.links[i];
         ArticleData.website_source = this.source;
         ArticleData.PhoneNumber = PhoneNumber;
+        let URLOBJECT = new URL(this.links[i])
+        let id = URLOBJECT.pathname.split('/')[URLOBJECT.pathname.split('/').length - 1]
+        ArticleData.id = id
 
         console.log(ArticleData);
 
@@ -170,8 +175,8 @@ export class halooglasi {
     await this.setup();
     if (this.page !== null) {
       await this.Bulk();
-
-      await this.singleADD();
+      console.log(this.links)
+      // await this.singleADD();
 
       await this.CleenUp();
 

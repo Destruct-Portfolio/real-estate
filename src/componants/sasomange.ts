@@ -76,7 +76,7 @@ export class Sasomange {
         });
 
         console.log(PageLinks);
-      } catch (error) {}
+      } catch (error) { }
     }
   }
 
@@ -135,6 +135,8 @@ export class Sasomange {
               "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik",
 
             article_url: "",
+
+            id: ""
           };
         });
 
@@ -161,16 +163,12 @@ export class Sasomange {
 
         GrabData.article_url = this.Links[i];
 
+        GrabData.id = new URL(this.Links[i]).pathname.split('/')[2]
+
         console.log(GrabData);
+
         this.payload.push(GrabData);
 
-        if (this.payload.length === 20) {
-          this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
-
-          let save = await new Save2().wrtieData("sasomange", this.payload);
-
-          this.payload = [];
-        }
       }
     } catch (error) {
       console.log(error);
@@ -187,8 +185,6 @@ export class Sasomange {
       await this.Bulk();
 
       await this.SingleAD();
-
-      let save = await new Save2().wrtieData("sasomange", this.payload);
 
       await this.cleanUp();
 

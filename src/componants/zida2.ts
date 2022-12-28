@@ -122,7 +122,8 @@ export class Zida {
           article_url: this.Links[i],
           website_source: this.source,
           property_pictures: images,
-          PhoneNumber: PhoneNumber
+          PhoneNumber: PhoneNumber,
+          id: WebsiteID[WebsiteID.length - 1]
         });
 
         this.payload.push({
@@ -133,7 +134,8 @@ export class Zida {
           article_url: this.Links[i],
           website_source: this.source,
           property_pictures: images,
-          PhoneNumber: PhoneNumber
+          PhoneNumber: PhoneNumber,
+          id: WebsiteID[WebsiteID.length - 1]
         })
       } catch (error) {
         console.log(error)

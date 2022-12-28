@@ -116,11 +116,11 @@ class Nekretinine {
 
             ArticleData.id = Link.split('/')[Link.split('/').length - 2]
 
-            let check_things = Object.values(ArticleData).every(value => value != null);
+            let check_null = Object.values(ArticleData).every(value => value != null);
 
-            console.log(check_things)
+            console.log(check_null)
 
-            if (check_things) {
+            if (check_null) {
                 return ArticleData
             } else {
                 attemempts++

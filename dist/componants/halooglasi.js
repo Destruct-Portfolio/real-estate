@@ -99,11 +99,15 @@ export class halooglasi {
                         website_source: "",
                         property_pictures: images ? images : null,
                         PhoneNumber: "",
+                        id: ""
                     };
                 });
                 ArticleData.article_url = this.links[i];
                 ArticleData.website_source = this.source;
                 ArticleData.PhoneNumber = PhoneNumber;
+                let URLOBJECT = new URL(this.links[i]);
+                let id = URLOBJECT.pathname.split('/')[URLOBJECT.pathname.split('/').length - 1];
+                ArticleData.id = id;
                 console.log(ArticleData);
                 this.payload.push(ArticleData);
             }
@@ -118,7 +122,8 @@ export class halooglasi {
         await this.setup();
         if (this.page !== null) {
             await this.Bulk();
-            await this.singleADD();
+            console.log(this.links);
+            // await this.singleADD();
             await this.CleenUp();
             console.log(this.payload.length);
             fs.writeFileSync('../data/halou2.json', JSON.stringify(this.payload));

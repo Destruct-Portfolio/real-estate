@@ -51,6 +51,7 @@ class Nekretinine {
                     website_source: "",
                     property_pictures: ImageLinks ? ImageLinks : [],
                     PhoneNumber: "",
+                    id: ""
                 };
             });
             let phoneNumber = await this.client.click("body > div:nth-child(19) > div:nth-child(9) > div.row > div.property__body.col-lg-8.col-xl-9.mb-3 > div.d-none.d-md-block > div > div > div > div > div > div.mb-2.horizontal-box > div > div.col-12.col-sm-6.contact-footer > div.mb-3.cell-number-box > div > form:nth-child(1) > button")
@@ -66,8 +67,9 @@ class Nekretinine {
                 return null;
             });
             ArticleData.article_url = Link;
-            ArticleData.website_source = "";
+            ArticleData.website_source = "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/";
             ArticleData.PhoneNumber = phoneNumber;
+            ArticleData.id = Link.split('/')[Link.split('/').length - 2];
             let check_things = Object.values(ArticleData).every(value => value != null);
             console.log(check_things);
             if (check_things) {

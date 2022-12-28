@@ -1,6 +1,5 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
-import { Save2 } from "../core/save.js";
 export class Sasomange {
     page;
     Browser;
@@ -81,6 +80,7 @@ export class Sasomange {
                         PhoneNumber: "",
                         website_source: "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik",
                         article_url: "",
+                        id: ""
                     };
                 });
                 let PhoneNumber = await this.page.click("#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn")
@@ -97,13 +97,9 @@ export class Sasomange {
                 });
                 GrabData.PhoneNumber = PhoneNumber;
                 GrabData.article_url = this.Links[i];
+                GrabData.id = new URL(this.Links[i]).pathname.split('/')[2];
                 console.log(GrabData);
                 this.payload.push(GrabData);
-                if (this.payload.length === 20) {
-                    this.Logger.info("20 Elements Loaded and Are ready to be saved ...");
-                    let save = await new Save2().wrtieData("sasomange", this.payload);
-                    this.payload = [];
-                }
             }
         }
         catch (error) {
@@ -119,7 +115,6 @@ export class Sasomange {
         if (this.page !== null) {
             await this.Bulk();
             await this.SingleAD();
-            let save = await new Save2().wrtieData("sasomange", this.payload);
             await this.cleanUp();
             return this.payload;
         }

@@ -1,8 +1,10 @@
 import puppeteer, { Page, Browser } from "puppeteer"
 import { Ad_Object } from "src/types"
-import { NodeBuilderFlags } from "typescript"
 
-class halou_updated {
+// make the error handling better 
+
+
+export default class halou_updated {
     private client: Page | null
 
     private browser: Browser | null
@@ -116,35 +118,34 @@ class halou_updated {
 
             // scraping the ADLINKS
             for (var page = 1; page <= Page_Numbers; page++) {
-                try {
-                    await this.client.goto(source + "&page=" + page, { waitUntil: 'networkidle2', timeout: 0 })
+                await this.client.goto(source + "&page=" + page, { waitUntil: 'networkidle2', timeout: 0 })
 
-                    let ADS = await this.client.$$eval(
-                        "#ad-list-2 > div.col-md-12",
-                        (item) => {
-                            let t = item.map((item) => {
-                                return item.querySelector("a")!.href;
-                            });
-                            return t;
-                        }
-                    );
-
-                    for (let AD = 0; AD <= ADS.length; AD++) {
-                        const ad_link = ADS[AD];
-                        let result_ad = await this.ScrapeADLink(ad_link)
-                        console.log(result_ad)
-                        if (result_ad !== undefined) this.payload.push(result_ad)
+                let ADS = await this.client.$$eval(
+                    "#ad-list-2 > div.col-md-12",
+                    (item) => {
+                        let t = item.map((item) => {
+                            return item.querySelector("a")!.href;
+                        });
+                        return t;
                     }
-
-                } catch (error) {
-                    console.log(`Failed to load  :: ${source}"&page="${page}`)
+                );
+                console.log(ADS)
+                for (let AD = 0; AD <= ADS.length; AD++) {
+                    const ad_link = ADS[AD];
+                    let result_ad = await this.ScrapeADLink(ad_link)
+                    console.log(result_ad)
+                    if (result_ad !== undefined) this.payload.push(result_ad)
                 }
+
+
             }
+
+        } else {
+            console.log("[PUPPETEER] has Failed to start ... ")
+            return null
 
         }
 
-        console.log("[PUPPETEER] has Failed to start ... ")
-        return null
     }
 }
 

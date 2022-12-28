@@ -5,7 +5,7 @@ import fs, { link } from "node:fs"
 
 //Need to Create a check to see if the any of the values scrappped are null 
 
-class Nekretinine {
+export default class Nekretinine_updated {
     private client: Page | null
     private Browser: Browser | null
 
@@ -131,7 +131,7 @@ class Nekretinine {
 
 
 
-    public async Script() {
+    public async exec() {
         await this.setup()
         let Payload: Ad_Object[] = []
         for (var i = 1; i <= 5; i++) {
@@ -174,4 +174,4 @@ class Nekretinine {
 
 }
 
-console.log(await new Nekretinine().Script())
+console.log(await new Nekretinine_updated().exec())

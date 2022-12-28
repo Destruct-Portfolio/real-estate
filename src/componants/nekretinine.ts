@@ -4,11 +4,10 @@ import { Ad_Object } from "src/types";
 
 import Logger from "../misc/logger.js";
 
-import { Save2 } from "../core/save.js";
 
 import fs from "fs"
 
-export class Nekretinine {
+export default class Nekretinine {
 
   private Logger: Logger;
 

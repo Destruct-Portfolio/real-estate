@@ -1,4 +1,4 @@
-import { Handler } from "./core/handler.js";
+/* import { Handler } from "./core/handler.js";
 import schedule from "node-schedule";
 
 //Igniter
@@ -25,3 +25,10 @@ await Index.start();
 var job = schedule.scheduleJob(TimeConfig, async () => {
   await Index.start();
 });
+ */
+
+
+import Handler from "./core/handler";
+
+await Handler.exec()
+

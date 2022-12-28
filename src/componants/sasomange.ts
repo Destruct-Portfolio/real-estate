@@ -4,7 +4,7 @@ import Logger from "../misc/logger.js";
 import { Save2 } from "../core/save.js";
 import fs from "fs"
 
-export class Sasomange {
+export default class Sasomange {
   private page: Page | null;
   private Browser: Browser | null;
   private payload: Ad_Object[];

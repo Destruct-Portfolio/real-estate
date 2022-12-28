@@ -1,11 +1,4 @@
-import { halooglasi } from "../componants/halooglasi.js";
-
-import { Nekretinine } from "../componants/nekretinine.js";
-
-import { Sasomange } from "../componants/sasomange.js";
-
-import { Zida } from "../componants/zida2.js";
-
+/* 
 export class Handler {
   private halo: halooglasi;
   private Nekret: Nekretinine;
@@ -37,6 +30,26 @@ export class Handler {
     } catch (error) {
       console.log(error);
       return;
+    }
+  }
+}
+ */
+import halou_updated from "src/componants/halooglasi_updated"
+import Nekretinine_updated from "src/componants/nekretinine_updated"
+import Sasomange from "src/componants/sasomange"
+import Zida from "src/componants/zida2"
+
+export default class Handler {
+  private static scrapers = [
+    halou_updated,
+    Nekretinine_updated,
+    Sasomange,
+    Zida
+  ]
+
+  public static async exec() {
+    for (const scraper of Handler.scrapers) {
+      await new scraper().exec()
     }
   }
 }

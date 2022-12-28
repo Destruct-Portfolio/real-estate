@@ -70,9 +70,9 @@ class Nekretinine {
             ArticleData.website_source = "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/";
             ArticleData.PhoneNumber = phoneNumber;
             ArticleData.id = Link.split('/')[Link.split('/').length - 2];
-            let check_things = Object.values(ArticleData).every(value => value != null);
-            console.log(check_things);
-            if (check_things) {
+            let check_null = Object.values(ArticleData).every(value => value != null);
+            console.log(check_null);
+            if (check_null) {
                 return ArticleData;
             }
             else {

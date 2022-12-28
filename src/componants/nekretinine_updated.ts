@@ -141,7 +141,7 @@ export default class Nekretinine_updated {
                     { timeout: 0, waitUntil: "networkidle2" })
 
                 //Collect ALL THE LINK
-                let PageLinks = await this.client?.$$eval(
+                let PageLinks = await this.client!.$$eval(
                     "div.row.offer",
                     (item) => {
                         let t = item.map((item) => {
@@ -151,14 +151,14 @@ export default class Nekretinine_updated {
                     }
                 );
                 console.log(PageLinks)
-                if (PageLinks !== undefined) {
-                    for (var ADLINK = 0; ADLINK < PageLinks!.length; ADLINK++) {
-                        console.log(`Proccessing this ${PageLinks[ADLINK]}`)
-                        let ADOBJECT = await this.ScrapeADLINK(PageLinks[ADLINK])
-                        console.log(ADOBJECT)
-                        if (ADOBJECT !== undefined) Payload.push(ADOBJECT!)
-                    }
+
+                for (var ADLINK = 0; ADLINK < PageLinks!.length; ADLINK++) {
+                    console.log(`Proccessing this ${PageLinks[ADLINK]}`)
+                    let ADOBJECT = await this.ScrapeADLINK(PageLinks[ADLINK])
+                    console.log(ADOBJECT)
+                    if (ADOBJECT !== undefined) Payload.push(ADOBJECT!)
                 }
+
 
             } catch (error) {
                 console.log("Failed To Load  :: " + "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/" + i)

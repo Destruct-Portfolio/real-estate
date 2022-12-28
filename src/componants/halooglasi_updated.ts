@@ -30,38 +30,53 @@ export default class halou_updated {
             await this.client!.goto(link, { waitUntil: 'networkidle2', timeout: 0 })
             //Scrape 
             let ArticleData: Ad_Object = await this.client!.evaluate(() => {
-                let Rooms = document.querySelector("#plh13");
-                let meter = document.querySelector("#plh12");
-                let location1 = document.querySelector("#plh3");
-                let location2 = document.querySelector('#plh4')
-                let location3 = document.querySelector('#plh5')
-                let price = document.querySelector(
-                    "#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail"
-                );
+                try {
+                    let Rooms = document.querySelector("#plh13");
+                    let meter = document.querySelector("#plh12");
+                    let location1 = document.querySelector("#plh3");
+                    let location2 = document.querySelector('#plh4')
+                    let location3 = document.querySelector('#plh5')
+                    let price = document.querySelector(
+                        "#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail"
+                    );
 
-                let images = Array.from(
-                    document.querySelectorAll(
-                        "#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img"
-                    )
-                ).map((item) => {
-                    console.log((item as HTMLImageElement).src);
-                    return (item as HTMLImageElement).src;
-                });
+                    let images = Array.from(
+                        document.querySelectorAll(
+                            "#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img"
+                        )
+                    ).map((item) => {
+                        console.log((item as HTMLImageElement).src);
+                        return (item as HTMLImageElement).src;
+                    });
 
-                return {
-                    id: "",
-                    Number_Of_Rooms: Rooms ? (Rooms as HTMLElement).innerText : null,
-                    square_meters: meter ? (meter as HTMLElement).innerText : null,
-                    property_location: location1
-                        ? (location1 as HTMLElement).innerText
-                        : null + ' ' + location2 ? (location2 as HTMLElement).innerText : null + " " + location3 ? (location3 as HTMLElement).innerHTML : null,
-                    property_price: price ? (price as HTMLElement).innerText : null,
-                    article_url: "",
-                    website_source: "",
-                    property_pictures: images ? images : null,
-                    PhoneNumber: "",
+                    return {
+                        id: "",
+                        Number_Of_Rooms: Rooms ? (Rooms as HTMLElement).innerText : null,
+                        square_meters: meter ? (meter as HTMLElement).innerText : null,
+                        property_location: location1
+                            ? (location1 as HTMLElement).innerText
+                            : null + ' ' + location2 ? (location2 as HTMLElement).innerText : null + " " + location3 ? (location3 as HTMLElement).innerHTML : null,
+                        property_price: price ? (price as HTMLElement).innerText : null,
+                        article_url: "",
+                        website_source: "",
+                        property_pictures: images ? images : null,
+                        PhoneNumber: "",
 
-                };
+                    };
+                } catch (error) {
+                    return {
+                        id: null,
+                        Number_Of_Rooms: null,
+                        square_meters: null,
+                        property_location: null,
+                        property_price: null,
+                        article_url: null,
+                        website_source: null,
+                        property_pictures: null,
+                        PhoneNumber: null,
+
+                    }
+                }
             });
             // scrape Phone Number 
 
@@ -78,6 +93,7 @@ export default class halou_updated {
                     console.log("Phone Number Was Not Found");
                     return "null";
                 });
+
             ArticleData.article_url = link;
             ArticleData.website_source = "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
             ArticleData.PhoneNumber = PhoneNumber;

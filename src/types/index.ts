@@ -1,5 +1,5 @@
 export interface Ad_Object {
-  id: string;
+  id: string | null;
 
   Number_Of_Rooms: string | null;
 

@@ -4,8 +4,11 @@ import { NodeBuilderFlags } from "typescript"
 
 class halou_updated {
     private client: Page | null
+
     private browser: Browser | null
+
     private payload: Ad_Object[]
+
     constructor() {
         this.client = null
         this.browser = null
@@ -13,7 +16,8 @@ class halou_updated {
     }
 
     private async setup() {
-        this.browser = await puppeteer.launch({ headless: false })
+        this.browser = await puppeteer.launch({ headless: true })
+
         this.client = await this.browser.newPage()
     }
 

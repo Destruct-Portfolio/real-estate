@@ -155,7 +155,7 @@ export class Zida {
       await this.Bulk();
       await this.SingleAD();
       await this.CleanUp();
-      fs.writeFileSync('../data/zida.json', JSON.stringify(this.payload))
+      fs.writeFileSync('../data/zida_updated.json', JSON.stringify(this.payload))
       return this.payload;
     } else {
       this.Logger.info("Puppeteer Failed To Lunch . ");

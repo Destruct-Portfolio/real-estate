@@ -166,7 +166,7 @@ class Nekretinine {
             }
         }
 
-        fs.writeFileSync('../data/nek2.json', JSON.stringify(Payload))
+        fs.writeFileSync('../data/nek2_updated.json', JSON.stringify(Payload))
         return Payload
 
     }

@@ -1,6 +1,6 @@
 import fs from "fs";
 import Logger from "../misc/logger.js";
-export class Save2 {
+export default class Save2 {
     path = "../data/";
     Logger = new Logger("Saver", "Saver");
     async wrtieData(FileName, Ads) {

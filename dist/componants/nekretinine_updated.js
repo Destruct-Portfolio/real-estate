@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import fs from "node:fs";
+import Save2 from "../core/save.js";
 //Need to Create a check to see if the any of the values scrappped are null 
 export default class Nekretinine_updated {
     client;
@@ -88,21 +88,19 @@ export default class Nekretinine_updated {
                 //goes to Page
                 await this.client.goto("https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/grad/beograd/vlasnik/lista/po-stranici/20/stranica/" + i, { timeout: 0, waitUntil: "networkidle2" });
                 //Collect ALL THE LINK
-                let PageLinks = await this.client?.$$eval("div.row.offer", (item) => {
+                let PageLinks = await this.client.$$eval("div.row.offer", (item) => {
                     let t = item.map((item) => {
                         return item.querySelector("a").href;
                     });
                     return t;
                 });
                 console.log(PageLinks);
-                if (PageLinks !== undefined) {
-                    for (var ADLINK = 0; ADLINK < PageLinks.length; ADLINK++) {
-                        console.log(`Proccessing this ${PageLinks[ADLINK]}`);
-                        let ADOBJECT = await this.ScrapeADLINK(PageLinks[ADLINK]);
-                        console.log(ADOBJECT);
-                        if (ADOBJECT !== undefined)
-                            Payload.push(ADOBJECT);
-                    }
+                for (var ADLINK = 0; ADLINK < PageLinks.length; ADLINK++) {
+                    console.log(`Proccessing this ${PageLinks[ADLINK]}`);
+                    let ADOBJECT = await this.ScrapeADLINK(PageLinks[ADLINK]);
+                    console.log(ADOBJECT);
+                    if (ADOBJECT !== undefined)
+                        Payload.push(ADOBJECT);
                 }
             }
             catch (error) {
@@ -110,8 +108,9 @@ export default class Nekretinine_updated {
                 i--;
             }
         }
-        fs.writeFileSync('../data/nek2_updated.json', JSON.stringify(Payload));
+        await new Save2().wrtieData("nekretine_updated", Payload);
+        Payload = [];
         return Payload;
     }
 }
-console.log(await new Nekretinine_updated().exec());
+//console.log(await new Nekretinine_updated().exec())

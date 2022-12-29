@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import Save2 from "../core/save.js";
 // make the error handling better 
 export default class halou_updated {
     client;
@@ -90,19 +91,19 @@ export default class halou_updated {
     async exec() {
         let source = "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
         await this.setup();
-        if (this.client !== null) {
-            // Go to the source and get the PAGE Number
-            await this.client.goto(source, { waitUntil: "networkidle2", timeout: 0 });
-            // returns the number of Pages
-            let Page_Numbers = await this.client.$eval("#pager-1 > ul > li:nth-child(8) > a", (el) => el.innerHTML).catch(() => {
-                return "20";
-            });
-            // convert from string to number 
-            Page_Numbers = parseInt(Page_Numbers);
-            console.log(Page_Numbers);
-            // scraping the ADLINKS
-            for (var page = 1; page <= Page_Numbers; page++) {
-                await this.client.goto(source + "&page=" + page, { waitUntil: 'networkidle2', timeout: 0 });
+        // Go to the source and get the PAGE Number
+        await this.client.goto(source, { waitUntil: "networkidle2", timeout: 0 });
+        // returns the number of Pages
+        let Page_Numbers = await this.client.$eval("#pager-1 > ul > li:nth-child(8) > a", (el) => el.innerHTML).catch(() => {
+            return "20";
+        });
+        // convert from string to number 
+        Page_Numbers = parseInt(Page_Numbers);
+        console.log(Page_Numbers);
+        // scraping the ADLINKS
+        for (var page = 1; page <= Page_Numbers; page++) {
+            try {
+                await this.client.goto(source + "&page=" + page, { waitUntil: "networkidle2", timeout: 0 });
                 let ADS = await this.client.$$eval("#ad-list-2 > div.col-md-12", (item) => {
                     let t = item.map((item) => {
                         return item.querySelector("a").href;
@@ -114,15 +115,18 @@ export default class halou_updated {
                     const ad_link = ADS[AD];
                     let result_ad = await this.ScrapeADLink(ad_link);
                     console.log(result_ad);
-                    if (result_ad !== undefined)
+                    if (result_ad !== undefined) {
                         this.payload.push(result_ad);
+                    }
                 }
             }
+            catch (error) {
+                console.log(`Failed to load :: ${source}"&page="${page}`);
+            }
         }
-        else {
-            console.log("[PUPPETEER] has Failed to start ... ");
-            return null;
-        }
+        await new Save2().wrtieData("halou_updated", this.payload);
+        this.payload = [];
+        return this.payload;
     }
 }
-console.log(new halou_updated().exec());
+//console.log(new halou_updated().exec())

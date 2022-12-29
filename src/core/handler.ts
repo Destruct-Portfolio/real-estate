@@ -7,8 +7,8 @@ import sas_updated from "../componants/sas_updated.js"
 export default class Handler {
   private static scrapers = [
     /*    halou_updated,
-       Nekretinine_updated, */
     sas_updated,
+    Nekretinine_updated, */
     Zida
   ]
 

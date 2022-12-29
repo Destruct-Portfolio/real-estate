@@ -2,12 +2,13 @@ import halou_updated from "../componants/halooglasi_updated.js"
 import Nekretinine_updated from "../componants/nekretinine_updated.js"
 import Sasomange from "../componants/sasomange.js"
 import Zida from "../componants/zida2.js"
+import sas_updated from "src/componants/sas_updated.js"
 
 export default class Handler {
   private static scrapers = [
     /*    halou_updated,
        Nekretinine_updated, */
-    Sasomange,
+    sas_updated,
     Zida
   ]
 

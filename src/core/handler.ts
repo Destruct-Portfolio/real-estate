@@ -1,7 +1,6 @@
 import halou_updated from "../componants/halooglasi_updated.js"
 import Nekretinine_updated from "../componants/nekretinine_updated.js"
-import Sasomange from "../componants/sasomange.js"
-import Zida from "../componants/zida2.js"
+import Zida_updated from "src/componants/zida_updated.js"
 import sas_updated from "../componants/sas_updated.js"
 
 export default class Handler {
@@ -9,7 +8,7 @@ export default class Handler {
     /*    halou_updated,
     sas_updated,
     Nekretinine_updated, */
-    Zida
+    Zida_updated
   ]
 
   public static async exec() {

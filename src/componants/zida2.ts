@@ -149,7 +149,7 @@ export default class Zida {
     await this.Browser!.close();
   }
 
-  public async exec() {
+  public async exec(): Promise<Ad_Object[]> {
     await this.setup();
     if (this.page !== null) {
       await this.Bulk();
@@ -159,7 +159,7 @@ export default class Zida {
       await this.CleanUp();
 
       await new Save2().wrtieData('zida_updated', this.payload)
-
+      this.payload = []
       return this.payload;
     } else {
 
@@ -172,5 +172,3 @@ export default class Zida {
   }
 
 }
-
-//console.log(await new Zida().exec());

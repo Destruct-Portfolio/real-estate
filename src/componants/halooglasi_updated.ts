@@ -114,7 +114,7 @@ export default class halou_updated {
     }
 
 
-    public async exec(): Promise<void> {
+    public async exec(): Promise<Ad_Object[]> {
         let source = "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
         await this.setup()
 
@@ -152,8 +152,6 @@ export default class halou_updated {
                     console.log(result_ad)
                     if (result_ad !== undefined) {
                         this.payload.push(result_ad)
-                        await new Save2().wrtieData("halou_updated", this.payload)
-                        this.payload = []
                     }
                 }
             } catch (error) {
@@ -161,6 +159,9 @@ export default class halou_updated {
             }
         }
 
+        await new Save2().wrtieData("halou_updated", this.payload)
+        this.payload = []
+        return this.payload
     }
 }
 

@@ -190,10 +190,10 @@ export default class Sasomange {
       await this.cleanUp();
 
       await new Save2().wrtieData('sas_updated.json', this.payload)
+      this.payload = []
       return this.payload;
     } else {
       this.Logger.info("Puppeteer Failed To Lunch . ");
-
       return this.payload;
     }
   }

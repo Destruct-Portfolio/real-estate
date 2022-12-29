@@ -132,7 +132,7 @@ export default class Nekretinine_updated {
 
 
 
-    public async exec(): Promise<void> {
+    public async exec(): Promise<Ad_Object[]> {
         await this.setup()
         let Payload: Ad_Object[] = []
         for (var i = 1; i <= 5; i++) {
@@ -167,6 +167,8 @@ export default class Nekretinine_updated {
             }
         }
         await new Save2().wrtieData("nekretine_updated", Payload)
+        Payload = []
+        return Payload
     }
 
 

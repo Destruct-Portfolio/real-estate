@@ -52,8 +52,8 @@ export default class Zida {
           waitUntil: "networkidle2",
           timeout: 0,
         });
-        let PageLinks: string[] | undefined = await this.page?.$$eval(
-          "body > app-root > app-search > div > div > mat-card > main > div > div.flex.flex-col.gap-4 > app-ad-search-preview",
+        let PageLinks: string[] = await this.page!.$$eval(
+          "body > app-root > app-search > div > div > div > main > div > div.flex.flex-col.gap-4 > app-ad-search-preview",
           (item) => {
             let t = item.map((item) => {
               return item.querySelector("a")!.href;
@@ -65,7 +65,7 @@ export default class Zida {
         console.log(PageLinks);
         console.log(`[<<] Page ${this.source + i} collected ${PageLinks?.length} Link`)
 
-        PageLinks?.map((item) => {
+        PageLinks.map((item) => {
           this.Links.push(item);
         });
       } catch (error) { }

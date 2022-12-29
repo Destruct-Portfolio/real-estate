@@ -1,10 +1,10 @@
-import Zida from "../componants/zida2.js";
+import Zida_updated from "src/componants/zida_updated.js";
 export default class Handler {
     static scrapers = [
         /*    halou_updated,
         sas_updated,
         Nekretinine_updated, */
-        Zida
+        Zida_updated
     ];
     static async exec() {
         for (const scraper of Handler.scrapers) {

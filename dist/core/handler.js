@@ -1,5 +1,5 @@
 import Zida from "../componants/zida2.js";
-import sas_updated from "src/componants/sas_updated.js";
+import sas_updated from "../componants/sas_updated.js";
 export default class Handler {
     static scrapers = [
         /*    halou_updated,

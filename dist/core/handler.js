@@ -1,10 +1,10 @@
-import Sasomange from "../componants/sasomange.js";
 import Zida from "../componants/zida2.js";
+import sas_updated from "src/componants/sas_updated.js";
 export default class Handler {
     static scrapers = [
         /*    halou_updated,
            Nekretinine_updated, */
-        Sasomange,
+        sas_updated,
         Zida
     ];
     static async exec() {

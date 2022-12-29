@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
-class halou_updated {
+// make the error handling better 
+export default class halou_updated {
     client;
     browser;
     payload;
@@ -86,29 +87,27 @@ class halou_updated {
             console.log(Page_Numbers);
             // scraping the ADLINKS
             for (var page = 1; page <= Page_Numbers; page++) {
-                try {
-                    await this.client.goto(source + "&page=" + page, { waitUntil: 'networkidle2', timeout: 0 });
-                    let ADS = await this.client.$$eval("#ad-list-2 > div.col-md-12", (item) => {
-                        let t = item.map((item) => {
-                            return item.querySelector("a").href;
-                        });
-                        return t;
+                await this.client.goto(source + "&page=" + page, { waitUntil: 'networkidle2', timeout: 0 });
+                let ADS = await this.client.$$eval("#ad-list-2 > div.col-md-12", (item) => {
+                    let t = item.map((item) => {
+                        return item.querySelector("a").href;
                     });
-                    for (let AD = 0; AD <= ADS.length; AD++) {
-                        const ad_link = ADS[AD];
-                        let result_ad = await this.ScrapeADLink(ad_link);
-                        console.log(result_ad);
-                        if (result_ad !== undefined)
-                            this.payload.push(result_ad);
-                    }
-                }
-                catch (error) {
-                    console.log(`Failed to load  :: ${source}"&page="${page}`);
+                    return t;
+                });
+                console.log(ADS);
+                for (let AD = 0; AD <= ADS.length; AD++) {
+                    const ad_link = ADS[AD];
+                    let result_ad = await this.ScrapeADLink(ad_link);
+                    console.log(result_ad);
+                    if (result_ad !== undefined)
+                        this.payload.push(result_ad);
                 }
             }
         }
-        console.log("[PUPPETEER] has Failed to start ... ");
-        return null;
+        else {
+            console.log("[PUPPETEER] has Failed to start ... ");
+            return null;
+        }
     }
 }
 console.log(new halou_updated().exec());

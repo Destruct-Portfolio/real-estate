@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import Logger from "../misc/logger.js";
 import fs from "fs";
-export class Sasomange {
+export default class Sasomange {
     page;
     Browser;
     payload;

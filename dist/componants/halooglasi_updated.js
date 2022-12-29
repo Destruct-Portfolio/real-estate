@@ -126,7 +126,13 @@ export default class halou_updated {
         }
         await new Save2().wrtieData("halou_updated", this.payload);
         this.payload = [];
+        await this.CLoseUP();
         return this.payload;
+    }
+    async CLoseUP() {
+        console.log('CLosing Down Browser and Page for SAS ');
+        await this.client.close();
+        await this.browser.close();
     }
 }
 //console.log(new halou_updated().exec())

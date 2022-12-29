@@ -110,7 +110,13 @@ export default class Nekretinine_updated {
         }
         await new Save2().wrtieData("nekretine_updated", Payload);
         Payload = [];
+        await this.CLoseUP();
         return Payload;
+    }
+    async CLoseUP() {
+        console.log('CLosing Down Browser and Page for SAS ');
+        await this.client.close();
+        await this.Browser.close();
     }
 }
 //console.log(await new Nekretinine_updated().exec())

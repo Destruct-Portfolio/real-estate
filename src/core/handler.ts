@@ -1,6 +1,6 @@
 import halou_updated from "../componants/halooglasi_updated.js"
 import Nekretinine_updated from "../componants/nekretinine_updated.js"
-import Zida_updated from "src/componants/zida_updated.js"
+import Zida_updated from "../componants/zida_updated.js"
 import sas_updated from "../componants/sas_updated.js"
 
 export default class Handler {

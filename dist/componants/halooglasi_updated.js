@@ -9,7 +9,7 @@ class halou_updated {
         this.payload = [];
     }
     async setup() {
-        this.browser = await puppeteer.launch({ headless: false });
+        this.browser = await puppeteer.launch({ headless: true });
         this.client = await this.browser.newPage();
     }
     async ScrapeADLink(link) {

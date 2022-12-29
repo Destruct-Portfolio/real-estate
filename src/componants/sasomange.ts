@@ -1,8 +1,8 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object } from "src/types";
 import Logger from "../misc/logger.js";
-import { Save2 } from "../core/save.js";
-import fs from "fs"
+import Save2 from "../core/save.js";
+
 
 export default class Sasomange {
   private page: Page | null;
@@ -189,7 +189,7 @@ export default class Sasomange {
 
       await this.cleanUp();
 
-      fs.writeFileSync('../data/sas_updated.json', JSON.stringify(this.payload))
+      await new Save2().wrtieData('sas_updated.json', this.payload)
       return this.payload;
     } else {
       this.Logger.info("Puppeteer Failed To Lunch . ");
@@ -199,4 +199,4 @@ export default class Sasomange {
   }
 }
 
-console.log(await new Sasomange().exec());
+//console.log(await new Sasomange().exec());

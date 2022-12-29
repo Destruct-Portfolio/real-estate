@@ -1,34 +1,14 @@
-/* import { Handler } from "./core/handler.js";
-import schedule from "node-schedule";
+import Handler from "./core/handler.js";
+import scheduale from "node-schedule"
 
-//Igniter
-class Index {
-  public static async start() {
-    let scraped_news = await new Handler().exec();
-  }
-}
-
-//Time Config
-const TimeConfig = new schedule.RecurrenceRule();
-
-TimeConfig.dayOfWeek = [0, new schedule.Range(0, 6)];
-
-TimeConfig.hour = 8;
-
-TimeConfig.minute = 0;
-
-console.log("STARTED ...");
-
-await Index.start();
-
-//lights
-var job = schedule.scheduleJob(TimeConfig, async () => {
-  await Index.start();
-});
- */
-
-
-import Handler from "./core/handler";
 
 await Handler.exec()
 
+/* const TimeConfig = new scheduale.RecurrenceRule();
+TimeConfig.hour = [0, 10, 20, 30, 40, 50];
+TimeConfig.dayOfWeek = [0, new scheduale.Range(1, 6)];
+
+scheduale.scheduleJob(TimeConfig, async function () {
+  // Your code to run the job goes here
+  await Handler.exec();
+}); */

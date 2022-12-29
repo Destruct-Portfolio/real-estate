@@ -1,6 +1,7 @@
 import puppeteer, { Page, Browser } from "puppeteer"
 import { Ad_Object } from "src/types"
 import fs, { link } from "node:fs"
+import Save2 from "../core/save.js"
 
 
 //Need to Create a check to see if the any of the values scrappped are null 
@@ -131,7 +132,7 @@ export default class Nekretinine_updated {
 
 
 
-    public async exec() {
+    public async exec(): Promise<void> {
         await this.setup()
         let Payload: Ad_Object[] = []
         for (var i = 1; i <= 5; i++) {
@@ -165,13 +166,10 @@ export default class Nekretinine_updated {
                 i--
             }
         }
-
-        fs.writeFileSync('../data/nek2_updated.json', JSON.stringify(Payload))
-        return Payload
-
+        await new Save2().wrtieData("nekretine_updated", Payload)
     }
 
 
 }
 
-console.log(await new Nekretinine_updated().exec())
+//console.log(await new Nekretinine_updated().exec())

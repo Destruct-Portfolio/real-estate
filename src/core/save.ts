@@ -3,7 +3,7 @@ import { Ad_Object } from "../types/index.js";
 import Logger from "../misc/logger.js";
 
 
-export class Save2 {
+export default class Save2 {
   private path = "../data/";
   private Logger = new Logger("Saver", "Saver");
 

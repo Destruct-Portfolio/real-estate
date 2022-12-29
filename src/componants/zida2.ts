@@ -1,11 +1,10 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object, Zida_Api } from "src/types";
 import Logger from "../misc/logger.js";
-//import { Save2 } from "../core/save.js";
+import Save2 from "../core/save.js";
 import axios from "axios"
-import fs from "node:fs"
 
-// need to FIX THE PAGES IN THIS BITCH 
+
 //let API_URL = 'https://api.4zida.rs/v6/eds/6325e7a260196a1e2904781c'
 
 export default class Zida {
@@ -154,15 +153,24 @@ export default class Zida {
     await this.setup();
     if (this.page !== null) {
       await this.Bulk();
+
       await this.SingleAD();
+
       await this.CleanUp();
-      fs.writeFileSync('../data/zida_updated.json', JSON.stringify(this.payload))
+
+      await new Save2().wrtieData('zida_updated', this.payload)
+
       return this.payload;
     } else {
+
       this.Logger.info("Puppeteer Failed To Lunch . ");
+
       return this.payload;
+
     }
+
   }
+
 }
 
-console.log(await new Zida().exec());
+//console.log(await new Zida().exec());

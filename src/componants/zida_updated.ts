@@ -90,9 +90,8 @@ export default class Zida_updated {
     }
 
     public async exec(): Promise<Ad_Object[]> {
-        let attempts = 0
         await this.setup()
-        for (var i = 1; i <= 12; i++) {
+        for (var i = 1; i <= 3; i++) {
             try {
                 await this.page!.goto(this.source + i, {
                     waitUntil: "networkidle2",
@@ -115,17 +114,13 @@ export default class Zida_updated {
                 }
             } catch (error) {
                 console.log('Failed To Load')
-                if (attempts <= 3) {
-                    console.log('Failed to Load Page ' + this.source + i)
-                } else {
-                    console.log('Failed to Load Page Traying again ... ')
-                    console.log("Number of attempts :: " + attempts)
-                    attempts++
-                    i--
-                }
+                console.log('Failed to Load Page Traying again ... ')
             }
         }
+        const newArr =
+            [...new Set(this.payload.map(a => JSON.stringify(a)))].map(a => JSON.parse(a))
 
+        console.log(newArr.length)
         await new Save2().wrtieData('zida_updated', this.payload)
         this.payload = []
         return this.payload;

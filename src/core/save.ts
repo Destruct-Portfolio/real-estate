@@ -12,7 +12,6 @@ export default class Save2 {
     let Load_File: Ad_Object[] = await JSON.parse(
       fs.readFileSync(this.path + FileName + ".json").toString()
     );
-
     this.Logger.info(
       "Verifying if there is Duplicates Between the old and the new data ..."
     );

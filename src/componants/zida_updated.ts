@@ -120,7 +120,7 @@ export default class Zida_updated {
                 } else {
                     console.log('Failed to Load Page Traying again ... ')
                     console.log("Number of attempts :: " + attempts)
-                    attempts
+                    attempts++
                     i--
                 }
             }

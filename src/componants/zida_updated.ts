@@ -129,3 +129,4 @@ export default class Zida_updated {
 
 
 
+console.log(await new Zida_updated().exec())

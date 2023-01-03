@@ -11,12 +11,13 @@ export default class Save2 {
 
   public async wrtieData(FileName: string, Ads: Ad_Object[]) {
     this.Logger.info(`Saving ${Ads.length} Ads to ${FileName} ... `);
-    const result: Ad_Object[] = [...Load_File, ...Ads]
-    const T = Array.from(new Set(result))
 
     let Load_File: Ad_Object[] = await JSON.parse(
       fs.readFileSync(this.path + FileName + ".json").toString()
     );
+
+    const result: Ad_Object[] = [...Load_File, ...Ads]
+    const T = Array.from(new Set(result))
 
     console.log(Load_File.length)
 
@@ -60,3 +61,5 @@ export default class Save2 {
   }
 
 }
+
+

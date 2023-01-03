@@ -11,6 +11,8 @@ export default class Save2 {
 
   public async wrtieData(FileName: string, Ads: Ad_Object[]) {
     this.Logger.info(`Saving ${Ads.length} Ads to ${FileName} ... `);
+    const result: Ad_Object[] = [...Load_File, ...Ads]
+    const T = Array.from(new Set(result))
 
     let Load_File: Ad_Object[] = await JSON.parse(
       fs.readFileSync(this.path + FileName + ".json").toString()
@@ -22,16 +24,25 @@ export default class Save2 {
       "Verifying if there is Duplicates Between the old and the new data ..."
     );
 
-    /*   for (let index = 0; index < Ads.length; index++) {
-        if (
-          !Load_File.some((item) => item.id === Ads[index].id)
-        )
-          Load_File.push(Ads[index]);
-      }
-      */
+    for (let index = 0; index < Ads.length; index++) {
+      if (
+        !Load_File.some((item) => item.id === Ads[index].id)
+      )
+        Load_File.push(Ads[index]);
+    }
 
-    const result: Ad_Object[] = [...Load_File, ...Ads]
-    const T = Array.from(new Set(result))
+    const result5 = T.reduce((finnalArray, current) => {
+      let obj = finnalArray.find((item) => { item.id === current.id })
+
+
+      if (obj) {
+        return finnalArray
+      } else {
+        return finnalArray.concat([current])
+      }
+    }, [])
+
+    console.log(result5.length)
 
     console.log(T.length)
 
@@ -42,14 +53,10 @@ export default class Save2 {
     console.log(withLodash.length)
     console.log(Load_File.length)
 
-    fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(withLodash));
+    fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(result5));
 
     return;
 
   }
 
 }
-
-
-
-

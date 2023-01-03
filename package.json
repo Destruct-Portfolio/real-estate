@@ -16,6 +16,8 @@
     "@ulixee/hero": "^2.0.0-alpha.12",
     "@ulixee/server": "^2.0.0-alpha.12",
     "axios": "^1.2.1",
+    "deep-object-diff": "^1.1.9",
+    "diff-arrays-of-objects": "^1.1.9",
     "dotenv": "^16.0.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",

@@ -1,7 +1,9 @@
+//@ts-nocheck
 import fs from "fs";
 import { Ad_Object } from "../types/index.js";
 import Logger from "../misc/logger.js";
-
+import { diff } from "deep-object-diff"
+import lodash from "lodash"
 
 export default class Save2 {
   private path = "../data/";
@@ -32,11 +34,22 @@ export default class Save2 {
     const T = Array.from(new Set(result))
 
     console.log(T.length)
+
+    const withLodash = lodash.uniq(T, "id")
+
     this.Logger.info("Saving the New Data into the File");
 
+    console.log(withLodash.length)
     console.log(Load_File.length)
 
-    fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(T));
+    fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(withLodash));
+
     return;
+
   }
+
 }
+
+
+
+

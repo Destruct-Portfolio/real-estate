@@ -2,7 +2,7 @@ import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object, Zida_Api } from "src/types";
 import Logger from "../misc/logger.js";
 import Save2 from "../core/save.js";
-import axios from "axios"
+import axios, { formToJSON } from "axios"
 
 
 //let API_URL = 'https://api.4zida.rs/v6/eds/6325e7a260196a1e2904781c'
@@ -16,8 +16,8 @@ export default class Zida {
 
   private source: string;
 
-  /*   private Links: string[];
-   */
+  private Links: string[];
+
   private payload: Ad_Object[];
 
   constructor() {
@@ -25,9 +25,9 @@ export default class Zida {
 
     this.page = null;
 
-    this.Browser = null;
+    this.Links = []
 
-    /*     this.Links = []; */
+    this.Browser = null;
 
     this.source = "https://www.4zida.rs/prodaja-stanova/beograd?lista_fizickih_lica="
 
@@ -62,6 +62,7 @@ export default class Zida {
         );
 
         console.log(PageLinks);
+        PageLinks.map(i => { this.Links.push(i) })
         console.log(`[<<] Page ${this.source + i} collected ${PageLinks?.length} Link`)
         for (var j = 0; j < PageLinks.length; j++) {
           await this.SingleAD(PageLinks[j])
@@ -157,6 +158,7 @@ export default class Zida {
 
       await this.CleanUp();
       console.log(this.payload.length)
+      console.log(this.Links)
       await new Save2().wrtieData('zida_updated', this.payload)
       this.payload = []
       return this.payload;

@@ -179,5 +179,3 @@ export default class Nekretinine_updated {
         await this.Browser!.close()
     }
 }
-
-//console.log(await new Nekretinine_updated().exec())

@@ -156,7 +156,7 @@ export default class Zida {
       /*  await this.SingleAD(); */
 
       await this.CleanUp();
-
+      console.log(this.payload.length)
       await new Save2().wrtieData('zida_updated', this.payload)
       this.payload = []
       return this.payload;

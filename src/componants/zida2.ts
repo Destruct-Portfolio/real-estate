@@ -16,8 +16,8 @@ export default class Zida {
 
   private source: string;
 
-  private Links: string[];
-
+  /*   private Links: string[];
+   */
   private payload: Ad_Object[];
 
   constructor() {
@@ -27,7 +27,7 @@ export default class Zida {
 
     this.Browser = null;
 
-    this.Links = [];
+    /*     this.Links = []; */
 
     this.source = "https://www.4zida.rs/prodaja-stanova/beograd?lista_fizickih_lica="
 

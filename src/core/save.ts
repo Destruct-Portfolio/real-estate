@@ -3,7 +3,6 @@ import fs from "fs";
 import { Ad_Object } from "../types/index.js";
 import Logger from "../misc/logger.js";
 import { diff } from "deep-object-diff"
-import { resourceLimits } from "worker_threads";
 
 /* export default class Save2 {
   private path = "../data/";
@@ -85,7 +84,7 @@ export default class Save2 {
 
     console.log(results)
 
-    resourceLimits.map((item) => {
+    results.map((item) => {
       Load_File.push(item)
     })
 

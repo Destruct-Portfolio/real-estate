@@ -14,20 +14,6 @@ export default class Save2 {
     );
 
   
-    // let results: Ad_Object[] = []
-    // // we start Comparing Here 
-    // Ads.map((item) => {
-    //   let t = Load_File.some((ID) => { ID.id === item.id })
-    //   if (!t) {
-    //     results.push(item)
-    //   }
-    // })
-
-    
-    // results.map((item) => {
-    //   Load_File.push(item)
-    // })
-
     for(const Ad of Ads){
       if(Load_File.some((ID) => { ID.id === Ad.id })){
         Load_File = [

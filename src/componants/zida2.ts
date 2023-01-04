@@ -44,7 +44,7 @@ export default class Zida {
 
   private async Bulk() {
     this.Logger.info("Grabing AD links in Multiple Pages ... ");
-
+    // we need To Replace This For Some Better Version Of what Currently Is 
     for (var i = 1; i <= 12; i++) {
       try {
         await this.page!.goto(this.source + i, {
@@ -74,8 +74,6 @@ export default class Zida {
   }
 
   private async SingleAD(Adurl: string) {
-    this.Logger.info("Starting Scraping For each AD Link Collected ... ");
-
     await this.page!.goto(Adurl, {
       waitUntil: "networkidle2",
       timeout: 0,

@@ -4,6 +4,9 @@ import scheduale from "node-schedule"
 
 await Handler.exec()
 
+console.log('Lunching the Second Time')
+
+await Handler.exec()
 /* const TimeConfig = new scheduale.RecurrenceRule();
 TimeConfig.hour = [0, 10, 20, 30, 40, 50];
 TimeConfig.dayOfWeek = [0, new scheduale.Range(1, 6)];

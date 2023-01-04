@@ -34,9 +34,7 @@ export default class halou_updated {
                 try {
                     let Rooms = document.querySelector("#plh13");
                     let meter = document.querySelector("#plh12");
-                    let location1 = document.querySelector("#plh3");
-                    let location2 = document.querySelector('#plh4')
-                    let location3 = document.querySelector('#plh5')
+                    let location = document.querySelector('#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.product-details-desc')
                     let price = document.querySelector(
                         "#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail"
                     );
@@ -54,9 +52,7 @@ export default class halou_updated {
                         id: "",
                         Number_Of_Rooms: Rooms ? (Rooms as HTMLElement).innerText : null,
                         square_meters: meter ? (meter as HTMLElement).innerText : null,
-                        property_location: location1
-                            ? (location1 as HTMLElement).innerText
-                            : null + ' ' + location2 ? (location2 as HTMLElement).innerText : null + " " + location3 ? (location3 as HTMLElement).innerHTML : null,
+                        property_location: location ? (location as HTMLElement).innerText.split('-').map((x) => { return x.trim() }).join(' ') : null,
                         property_price: price ? (price as HTMLElement).innerText : null,
                         article_url: "",
                         website_source: "",
@@ -176,4 +172,4 @@ export default class halou_updated {
 
 
 
-//console.log(new halou_updated().exec())
+console.log(new halou_updated().exec())

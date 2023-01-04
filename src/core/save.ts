@@ -3,9 +3,9 @@ import fs from "fs";
 import { Ad_Object } from "../types/index.js";
 import Logger from "../misc/logger.js";
 import { diff } from "deep-object-diff"
-import lodash from "lodash"
+import lodash, { result } from "lodash"
 
-export default class Save2 {
+/* export default class Save2 {
   private path = "../data/";
   private Logger = new Logger("Saver", "Saver");
 
@@ -61,5 +61,37 @@ export default class Save2 {
   }
 
 }
+ */
 
+export default class Save2 {
+  private path = "../data/";
 
+  public async wrtieData(FileName: string, Ads: Ad_Object[]) {
+    // read The File 
+    let Load_File: Ad_Object[] = await JSON.parse(
+      fs.readFileSync(this.path + FileName + ".json").toString()
+    );
+
+    console.log(Load_File)
+
+    let results: Ad_Object[] = []
+    // we start Comparing Here 
+    Ads.map((item) => {
+      let t = Load_File.some((ID) => { ID.id === item.id })
+      if (!t) {
+        results.push(item)
+      }
+    })
+
+    console.log(results)
+
+    result.map((item) => {
+      Load_File.push(item)
+    })
+
+    console.log(Load_File)
+    fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(Load_File))
+
+    return
+  }
+}

@@ -3,7 +3,6 @@ import fs from "fs";
 import { Ad_Object } from "../types/index.js";
 import Logger from "../misc/logger.js";
 import { diff } from "deep-object-diff"
-import lodash, { result } from "lodash"
 
 /* export default class Save2 {
   private path = "../data/";

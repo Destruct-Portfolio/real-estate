@@ -13,7 +13,9 @@ export default class Save2 {
       fs.readFileSync(this.path + FileName + ".json").toString()
     );
 
-  
+  if(Load_file.length === 0){
+	fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(Load_File))
+    } 
     for(const Ad of Ads){
       if(Load_File.some((ID) => { ID.id === Ad.id })){
         Load_File = [

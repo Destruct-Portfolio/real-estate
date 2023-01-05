@@ -111,6 +111,7 @@ export default class Zida {
         };
       });
 
+
       console.log({
         property_location: property_location,
         Number_Of_Rooms: articleData.Number_Of_Rooms,

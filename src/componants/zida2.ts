@@ -20,6 +20,8 @@ export default class Zida {
 
   private payload: Ad_Object[];
 
+  private Links2: Set<Ad_Object>
+
   constructor() {
     this.Logger = new Logger("scrapper", "Zida");
 
@@ -27,6 +29,7 @@ export default class Zida {
 
     this.Links = []
 
+    this.Links2 = new Set()
     this.Browser = null;
 
     this.source = "https://www.4zida.rs/prodaja-stanova/beograd?lista_fizickih_lica="
@@ -47,6 +50,8 @@ export default class Zida {
     // we need To Replace This For Some Better Version Of what Currently Is 
     for (var i = 1; i <= 12; i++) {
       try {
+        console.log(this.page!.url())
+
         await this.page!.goto(this.source + i, {
           waitUntil: "networkidle2",
           timeout: 0,
@@ -62,14 +67,24 @@ export default class Zida {
         );
 
         console.log(PageLinks);
+
         PageLinks.map(i => { this.Links.push(i) })
         console.log(`[<<] Page ${this.source + i} collected ${PageLinks?.length} Link`)
-        for (var j = 0; j < PageLinks.length; j++) {
-          await this.SingleAD(PageLinks[j])
 
+        for (var j = 0; j < PageLinks.length; j++) {
+          let T = this.payload.filter((item) => {
+
+            return item.article_url === PageLinks[j]
+          })
+
+          if (T.length === 0) {
+            await this.SingleAD(PageLinks[j])
+          }
         }
 
-      } catch (error) { }
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 

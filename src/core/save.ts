@@ -9,26 +9,32 @@ export default class Save2 {
 
   public async wrtieData(FileName: string, Ads: Ad_Object[]) {
     // read The File 
+    console.log(`From The Save Class ${Ads.length}`)
+
     let Load_File: Ad_Object[] = await JSON.parse(
       fs.readFileSync(this.path + FileName + ".json").toString()
     );
 
+
     if (Load_File.length === 0) {
-      fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(Load_File))
-    }
+      fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(Ads))
+    } else {
+      for (const Ad of Ads) {
 
-    for (const Ad of Ads) {
-
-      if (Load_File.some((ID) => { ID.id === Ad.id })) {
-        Load_File = [
-          ...Load_File,
-          Ad
-        ]
+        if (Load_File.some((ID) => { ID.id === Ad.id })) {
+          Load_File = [
+            ...Load_File,
+            Ad
+          ]
+        }
       }
+
+      console.log(Load_File)
+      fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(Load_File))
+
+
     }
 
-    console.log(Load_File)
-    fs.writeFileSync(this.path + FileName + ".json", JSON.stringify(Load_File))
 
     return
   }

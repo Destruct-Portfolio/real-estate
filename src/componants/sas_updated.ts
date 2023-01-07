@@ -20,7 +20,7 @@ export default class sas_updated {
 
         this.Links = [];
 
-        this.numPages = 12
+        this.numPages = 5
 
         this.source =
             "https://sasomange.rs/c/stanovi-prodaja/f/beograd?productsFacets.facets=status%3AACTIVE%2Cflat_advertiser_to_sale%3AVlasnik";
@@ -33,6 +33,7 @@ export default class sas_updated {
     }
 
     public async exec(): Promise<Ad_Object[]> {
+        console.log('This Is From Sas_updated')
         await this.setup()
         let attemempts = 0
         console.log('Bypassing the Cookies ...')
@@ -69,12 +70,16 @@ export default class sas_updated {
                         return t;
                     }
                 );
+
+                console.log(PageLinks)
+
                 console.log(`We collected ${PageLinks.length} from ${this.page!.url()}`)
                 for (var j = 0; j <= PageLinks.length; j++) {
                     let ArticleData = await this.SingleAD(PageLinks[j])
                     console.log(ArticleData)
                     if (ArticleData !== undefined) this.payload.push(ArticleData)
                 }
+
 
             } catch (error) {
                 console.log("Failed To Load")
@@ -88,15 +93,15 @@ export default class sas_updated {
                 }
             }
         }
-        await new Save2().wrtieData("sas_updated", this.payload)
+        new Save2().wrtieData("sas_updated", this.payload)
         this.payload = []
         await this.CLoseUP()
         return this.payload
 
     }
 
-    // Scrape AD : AD_Object
 
+    // Scrape AD : AD_Object
     private async SingleAD(link: string): Promise<Ad_Object | undefined> {
         let attemts = 0
         while (attemts < 5) {

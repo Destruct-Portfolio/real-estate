@@ -6,10 +6,10 @@ import Zida from "../componants/zida2.js"
 
 export default class Handler {
   private static scrapers = [
-    /*   halou_updated, */
+    halou_updated,
     sas_updated,
-    /*   Nekretinine_updated,
-      Zida */
+    Nekretinine_updated,
+    Zida
   ]
 
   public static async exec() {

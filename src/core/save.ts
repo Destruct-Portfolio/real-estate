@@ -1,11 +1,8 @@
 //@ts-nocheck
 import fs from "fs";
 import { Ad_Object } from "../types/index.js";
-import Logger from "../misc/logger.js";
-import { off } from "process";
 
-
-export default class Save2 {
+/* export default class Save2 {
   private path = "../data/";
 
   public wrtieData(FileName: string, Ads: Ad_Object[]) {
@@ -35,14 +32,15 @@ export default class Save2 {
     }
     return 'Done'
   }
-}
+} */
 
 
-class check_save {
+export default class Check_save {
   private path = '../data/'
-  public async Exists(FileName: string, AD: Ad_Object) {
+  public Exists(FileName: string, AD: { id: string }) {
     let LoadFile2: Ad_Object[] = fs.readFileSync(`${this.path}/${FileName}.json`)
     let data = JSON.parse(LoadFile2)
+    if (data.length === 0) return false
     let find = data.filter((i) => { if (i.id === AD.id) return i })
     if (find.length > 0) {
       return true
@@ -64,7 +62,7 @@ class check_save {
   }
 }
 
-let t = {
+/* let t = {
   "property_location": "Vuka Karadžića 31 Mladenovac centar Mladenovac opština Beograd",
   "Number_Of_Rooms": "3 sobe",
   "square_meters": "80 m²",
@@ -101,4 +99,4 @@ let t = {
   "id": "5e2f558f0c7cde6d0366db83feafeafeafeafea"
 }
 
-console.log(await new check_save().Write("zida_updated", t))
+console.log(await new check_save().Write("zida_updated", t)) */

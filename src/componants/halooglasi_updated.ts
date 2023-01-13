@@ -1,5 +1,5 @@
 import puppeteer, { Page, Browser } from "puppeteer"
-import Save2 from "../core/save.js"
+import Check_save from "../core/save.js"
 import { Ad_Object } from "src/types"
 
 // make the error handling better 
@@ -26,87 +26,95 @@ export default class halou_updated {
 
     private async ScrapeADLink(link: string): Promise<Ad_Object | undefined> {
         let attemempts = 0
+        let URLOBJECT = new URL(link)
+        let id = URLOBJECT.pathname.split('/')[URLOBJECT.pathname.split('/').length - 1]
+        let exists = new Check_save().Exists('halou_updated', { id: id })
+        if (!exists) {
+            console.log('Scraping AD with this ID :: ' + id)
+            while (attemempts <= 5) {
+                await this.client!.goto(link, { waitUntil: 'networkidle2', timeout: 0 })
+                //Scrape 
+                let ArticleData: Ad_Object = await this.client!.evaluate(() => {
+                    try {
+                        let Rooms = document.querySelector("#plh13");
+                        let meter = document.querySelector("#plh12");
+                        let location = document.querySelector('#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.product-details-desc')
+                        let price = document.querySelector(
+                            "#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail"
+                        );
 
-        while (attemempts <= 5) {
-            await this.client!.goto(link, { waitUntil: 'networkidle2', timeout: 0 })
-            //Scrape 
-            let ArticleData: Ad_Object = await this.client!.evaluate(() => {
-                try {
-                    let Rooms = document.querySelector("#plh13");
-                    let meter = document.querySelector("#plh12");
-                    let location = document.querySelector('#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.product-details-desc')
-                    let price = document.querySelector(
-                        "#wrapper > main > div > div.row.margin-bottom-20 > section > div.widget-ad-display.widget-basic-ad-details.ad-details > article > div > div > div.product-page-header > div.price-product-detail"
-                    );
+                        let images = Array.from(
+                            document.querySelectorAll(
+                                "#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img"
+                            )
+                        ).map((item) => {
+                            console.log((item as HTMLImageElement).src);
+                            return (item as HTMLImageElement).src;
+                        });
 
-                    let images = Array.from(
-                        document.querySelectorAll(
-                            "#fotorama > div > div.fotorama__nav-wrap > div > div > div > div > img"
-                        )
-                    ).map((item) => {
-                        console.log((item as HTMLImageElement).src);
-                        return (item as HTMLImageElement).src;
-                    });
+                        return {
+                            id: "",
+                            Number_Of_Rooms: Rooms ? (Rooms as HTMLElement).innerText : null,
+                            square_meters: meter ? (meter as HTMLElement).innerText : null,
+                            property_location: location ? (location as HTMLElement).innerText.split('-').map((x) => { return x.trim() }).join(' ') : null,
+                            property_price: price ? (price as HTMLElement).innerText : null,
+                            article_url: "",
+                            website_source: "",
+                            property_pictures: images ? images : null,
+                            PhoneNumber: "",
 
-                    return {
-                        id: "",
-                        Number_Of_Rooms: Rooms ? (Rooms as HTMLElement).innerText : null,
-                        square_meters: meter ? (meter as HTMLElement).innerText : null,
-                        property_location: location ? (location as HTMLElement).innerText.split('-').map((x) => { return x.trim() }).join(' ') : null,
-                        property_price: price ? (price as HTMLElement).innerText : null,
-                        article_url: "",
-                        website_source: "",
-                        property_pictures: images ? images : null,
-                        PhoneNumber: "",
+                        };
+                    } catch (error) {
+                        return {
+                            id: null,
+                            Number_Of_Rooms: null,
+                            square_meters: null,
+                            property_location: null,
+                            property_price: null,
+                            article_url: null,
+                            website_source: null,
+                            property_pictures: null,
+                            PhoneNumber: null,
 
-                    };
-                } catch (error) {
-                    return {
-                        id: null,
-                        Number_Of_Rooms: null,
-                        square_meters: null,
-                        property_location: null,
-                        property_price: null,
-                        article_url: null,
-                        website_source: null,
-                        property_pictures: null,
-                        PhoneNumber: null,
-
+                        }
                     }
-                }
-            });
-            // scrape Phone Number 
-
-            let PhoneNumber = await this.client!.click("#plh70 > div > p > span > em")
-                .then(async () => {
-                    await this.client!.waitForTimeout(3000);
-
-                    let Phonenmber2 = await this.client!.$eval("#plh70 > a", (el) => {
-                        return (el as HTMLElement).innerText;
-                    });
-                    return Phonenmber2;
-                })
-                .catch(() => {
-                    console.log("Phone Number Was Not Found");
-                    return "null";
                 });
+                // scrape Phone Number 
 
-            ArticleData.article_url = link;
-            ArticleData.website_source = "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
-            ArticleData.PhoneNumber = PhoneNumber;
-            let URLOBJECT = new URL(link)
-            let id = URLOBJECT.pathname.split('/')[URLOBJECT.pathname.split('/').length - 1]
-            ArticleData.id = id
+                let PhoneNumber = await this.client!.click("#plh70 > div > p > span > em")
+                    .then(async () => {
+                        await this.client!.waitForTimeout(3000);
 
-            let check_null = Object.values(ArticleData).every(value => value != null);
-            console.log(check_null)
+                        let Phonenmber2 = await this.client!.$eval("#plh70 > a", (el) => {
+                            return (el as HTMLElement).innerText;
+                        });
+                        return Phonenmber2;
+                    })
+                    .catch(() => {
+                        console.log("Phone Number Was Not Found");
+                        return "null";
+                    });
 
-            if (check_null) {
-                return ArticleData
-            } else {
-                attemempts++
+                ArticleData.article_url = link;
+                ArticleData.website_source = "https://www.halooglasi.com/nekretnine/prodaja-stanova/beograd?oglasivac_nekretnine_id_l=387237";
+                ArticleData.PhoneNumber = PhoneNumber;
+
+                ArticleData.id = id
+
+                let check_null = Object.values(ArticleData).every(value => value != null);
+                console.log(check_null)
+
+                if (check_null) {
+                    return ArticleData
+                } else {
+                    attemempts++
+                }
             }
+        } else {
+            console.log('ID :: ' + id + ' Allready exists')
+            return undefined
         }
+
     }
 
 
@@ -155,7 +163,7 @@ export default class halou_updated {
             }
         }
 
-        await new Save2().wrtieData("halou_updated", this.payload)
+        //await new Save2().wrtieData("halou_updated", this.payload)
         this.payload = []
         await this.CLoseUP()
         return this.payload

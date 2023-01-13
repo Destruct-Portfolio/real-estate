@@ -1,5 +1,5 @@
 import puppeteer, { Browser, Page } from "puppeteer";
-import Save2 from "../core/save.js";
+import Check_save from "../core/save.js";
 import { Ad_Object } from "src/types";
 
 
@@ -33,7 +33,6 @@ export default class sas_updated {
     }
 
     public async exec(): Promise<Ad_Object[]> {
-        console.log('This Is From Sas_updated')
         await this.setup()
         let attemempts = 0
         console.log('Bypassing the Cookies ...')
@@ -77,7 +76,7 @@ export default class sas_updated {
                 for (var j = 0; j <= PageLinks.length; j++) {
                     let ArticleData = await this.SingleAD(PageLinks[j])
                     console.log(ArticleData)
-                    if (ArticleData !== undefined) this.payload.push(ArticleData)
+                    if (ArticleData !== undefined) new Check_save().Write('sas_updated', ArticleData)
                 }
 
 
@@ -93,7 +92,7 @@ export default class sas_updated {
                 }
             }
         }
-        new Save2().wrtieData("sas_updated", this.payload)
+
         this.payload = []
         await this.CLoseUP()
         return this.payload
@@ -104,94 +103,101 @@ export default class sas_updated {
     // Scrape AD : AD_Object
     private async SingleAD(link: string): Promise<Ad_Object | undefined> {
         let attemts = 0
-        while (attemts < 5) {
-            await this.page!.goto(link, {
-                waitUntil: "networkidle2",
-                timeout: 0,
-            });
-
-            let ArticleData = await this.page!.evaluate(async () => {
-                let IgLinks: string[] = [];
-                let price = document.querySelector(
-                    "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > div > div.price-and-info-wrapper > div.price-share-wrapper > p > span.price-content"
-                );
-
-                let m2 = document.querySelector(
-                    "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(1) > p.value"
-                );
-
-                let location = document.querySelector(
-                    "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > div.vue-instance.product-vendor-info-wrapper > section > section.product-location.with-map > ul"
-                );
-
-                let rooms = document.querySelector(
-                    "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(2) > p.value > span"
-                );
-                let T = document.querySelector(
-                    "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended"
-                );
-                let Gal = Array.from(T!.querySelectorAll("img.pointer"));
-                Gal.map((item) => {
-                    console.log((item as HTMLImageElement).src);
-                    IgLinks.push((item as HTMLImageElement).src);
+        let ID = new URL(link).pathname.split('/')[2]
+        let exists = new Check_save().Exists("sas_updated", { id: ID })
+        if (!exists) {
+            console.log('Scraping AD with ID :: ' + ID)
+            while (attemts < 5) {
+                await this.page!.goto(link, {
+                    waitUntil: "networkidle2",
+                    timeout: 0,
                 });
+                let ArticleData = await this.page!.evaluate(async () => {
+                    let IgLinks: string[] = [];
 
-                return {
-                    property_price: price ? (price as HTMLElement).innerText : null,
-
-                    square_meters: m2 ? (m2 as HTMLElement).innerText : null,
-
-                    property_location: location
-                        ? (location as HTMLElement).innerText.split("\n").join(" ")
-                        : null,
-
-                    Number_Of_Rooms: rooms ? (rooms as HTMLElement).innerText : null,
-
-                    property_pictures: IgLinks,
-
-                    PhoneNumber: "",
-
-                    website_source:
-                        "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik",
-
-                    article_url: "",
-
-                    id: ""
-                };
-            });
-
-            let PhoneNumber = await this.page!.click(
-                "#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn"
-            )
-                .then(async () => {
-                    await this.page!.waitForTimeout(12000);
-
-                    let PhoneNumber = await this.page!.$eval(
-                        "body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a",
-                        (el) => {
-                            return (el as HTMLElement).innerText;
-                        }
+                    let price = document.querySelector(
+                        "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > div > div.price-and-info-wrapper > div.price-share-wrapper > p > span.price-content"
                     );
-                    return PhoneNumber;
-                })
-                .catch(() => {
-                    console.log("ellement To Click was not Found !!!");
-                    return "null";
+
+                    let m2 = document.querySelector(
+                        "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(1) > p.value"
+                    );
+
+                    let location = document.querySelector(
+                        "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > div.vue-instance.product-vendor-info-wrapper > section > section.product-location.with-map > ul"
+                    );
+
+                    let rooms = document.querySelector(
+                        "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended > section > section.pdp-main > div > section > ul > li:nth-child(2) > p.value > span"
+                    );
+                    let T = document.querySelector(
+                        "#page-wrap > section.product-details-page > div.container > section.sidebar-right-layout-extended"
+                    );
+                    let Gal = Array.from(T!.querySelectorAll("img.pointer"));
+                    Gal.map((item) => {
+                        console.log((item as HTMLImageElement).src);
+                        IgLinks.push((item as HTMLImageElement).src);
+                    });
+
+                    return {
+                        property_price: price ? (price as HTMLElement).innerText : null,
+
+                        square_meters: m2 ? (m2 as HTMLElement).innerText : null,
+
+                        property_location: location
+                            ? (location as HTMLElement).innerText.split("\n").join(" ")
+                            : null,
+
+                        Number_Of_Rooms: rooms ? (rooms as HTMLElement).innerText : null,
+
+                        property_pictures: IgLinks,
+
+                        PhoneNumber: "",
+
+                        website_source:
+                            "https://sasomange.rs/c/stanovi-prodaja?productsFacets.facets=flat_advertiser_to_sale%3AVlasnik",
+
+                        article_url: "",
+
+                        id: ""
+                    };
                 });
 
-            ArticleData.PhoneNumber = PhoneNumber;
-            ArticleData.article_url = link;
-            ArticleData.id = new URL(link).pathname.split('/')[2]
-            this.payload.push(ArticleData);
+                let PhoneNumber = await this.page!.click(
+                    "#page-wrap > section.product-details-page > div.vue-instance > section > div:nth-child(1) > div > div.buttons-wrapper > button.btn.btn--type-quaternary.contact-phone.js-pdp-call-btn"
+                )
+                    .then(async () => {
+                        await this.page!.waitForTimeout(12000);
 
-            let check_null = Object.values(ArticleData).every(value => value != null);
-            console.log(check_null)
-            if (check_null) {
-                return ArticleData
-            } else {
-                attemts++
+                        let PhoneNumber = await this.page!.$eval(
+                            "body > div.vfm.vfm--inset.vfm--absolute > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal.number-modal > div > div > div.modal-footer > div > a",
+                            (el) => {
+                                return (el as HTMLElement).innerText;
+                            }
+                        );
+                        return PhoneNumber;
+                    })
+                    .catch(() => {
+                        console.log("ellement To Click was not Found !!!");
+                        return "null";
+                    });
+
+                ArticleData.PhoneNumber = PhoneNumber;
+                ArticleData.article_url = link;
+                ArticleData.id = ID
+                let check_null = Object.values(ArticleData).every(value => value != null);
+                console.log(check_null)
+                if (check_null) {
+                    return ArticleData
+                } else {
+                    attemts++
+                }
             }
+        } else {
+            console.log('AD with ID :: ' + ID + " allready exists")
+            return undefined
         }
+
     }
 
     private async CLoseUP(): Promise<void> {

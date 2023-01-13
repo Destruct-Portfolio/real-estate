@@ -1,7 +1,7 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import { Ad_Object, Zida_Api } from "src/types";
 import Logger from "../misc/logger.js";
-import Save2 from "../core/save.js";
+import Check_save from "../core/save.js";
 import axios, { formToJSON } from "axios"
 
 
@@ -99,60 +99,69 @@ export default class Zida {
 
       try {
         let WebsiteID = Link.split('/')
-        let RequestPhoneNumber = await axios.get(`https://api.4zida.rs/v6/eds/${WebsiteID[WebsiteID.length - 1]}`)
-
-        let response: Zida_Api = RequestPhoneNumber.data
-
-        let PhoneNumber = response.author.phones![0].national
-
-        let Price = response.price ? response.price.toString() : null
-
-        let meter = response.area ? response.area : null
-
-        let images = response.images ? response.images.map((item) => {
-          return item.adDetails["1920x1080_fit_0_jpeg"]
-        }) : null
-
-        let property_location = response.safeAddress! + ' ' + response.placeIdsAndTitles!.map((item) => {
-          return item.title
-        }).join(' ')
-
-        let articleData = await this.page!.evaluate(() => {
-          let Number_Of_Rooms = document.querySelector(
-            "body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > app-info-item:nth-child(7) > div > strong"
-          );
-
-          return {
-            Number_Of_Rooms: Number_Of_Rooms
-              ? (Number_Of_Rooms as HTMLElement).innerText
-              : null,
-          };
-        });
 
 
-        console.log({
-          property_location: property_location,
-          Number_Of_Rooms: articleData.Number_Of_Rooms,
-          square_meters: meter,
-          property_price: Price,
-          article_url: Link,
-          website_source: this.source,
-          property_pictures: images,
-          PhoneNumber: PhoneNumber,
-          id: WebsiteID[WebsiteID.length - 1]
-        });
+        let exists = new Check_save().Exists('zida_updated', { id: WebsiteID[WebsiteID.length - 1] })
+        if (!exists) {
 
-        this.payload.push({
-          property_location: property_location,
-          Number_Of_Rooms: articleData.Number_Of_Rooms,
-          square_meters: meter,
-          property_price: Price,
-          article_url: Link,
-          website_source: this.source,
-          property_pictures: images,
-          PhoneNumber: PhoneNumber,
-          id: WebsiteID[WebsiteID.length - 1]
-        })
+          console.log('AD with ID :: ' + WebsiteID[WebsiteID.length - 1] + " Is Getting Scrapped ")
+          let RequestPhoneNumber = await axios.get(`https://api.4zida.rs/v6/eds/${WebsiteID[WebsiteID.length - 1]}`)
+
+          let response: Zida_Api = RequestPhoneNumber.data
+
+          let PhoneNumber = response.author.phones![0].national
+
+          let Price = response.price ? response.price.toString() : null
+
+          let meter = response.area ? response.area : null
+
+          let images = response.images ? response.images.map((item) => {
+            return item.adDetails["1920x1080_fit_0_jpeg"]
+          }) : null
+
+          let property_location = response.safeAddress! + ' ' + response.placeIdsAndTitles!.map((item) => {
+            return item.title
+          }).join(' ')
+
+          let articleData = await this.page!.evaluate(() => {
+            let Number_Of_Rooms = document.querySelector(
+              "body > app-root > app-ad-details > div > div.main-container > main > div:nth-child(7) > app-apartment-details > app-info-item:nth-child(7) > div > strong"
+            );
+
+            return {
+              Number_Of_Rooms: Number_Of_Rooms
+                ? (Number_Of_Rooms as HTMLElement).innerText
+                : null,
+            };
+          });
+
+
+          console.log({
+            property_location: property_location,
+            Number_Of_Rooms: articleData.Number_Of_Rooms,
+            square_meters: meter,
+            property_price: Price,
+            article_url: Link,
+            website_source: this.source,
+            property_pictures: images,
+            PhoneNumber: PhoneNumber,
+            id: WebsiteID[WebsiteID.length - 1]
+          });
+          new Check_save().Write('zida_updated', {
+            property_location: property_location,
+            Number_Of_Rooms: articleData.Number_Of_Rooms,
+            square_meters: meter,
+            property_price: Price,
+            article_url: Link,
+            website_source: this.source,
+            property_pictures: images,
+            PhoneNumber: PhoneNumber,
+            id: WebsiteID[WebsiteID.length - 1]
+          })
+        } else {
+          console.log('Article Allready exists')
+        }
+
       } catch (error) {
         console.log(error)
         return null
@@ -186,7 +195,7 @@ export default class Zida {
       await this.CleanUp();
       console.log(this.payload.length)
       console.log(this.Links)
-      new Save2().wrtieData('zida_updated', this.payload)
+      /*  new Save2().wrtieData('zida_updated', this.payload) */
       this.payload = []
       return this.payload;
     } else {

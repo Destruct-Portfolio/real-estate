@@ -155,7 +155,7 @@ export default class halou_updated {
                     let result_ad = await this.ScrapeADLink(ad_link)
                     console.log(result_ad)
                     if (result_ad !== undefined) {
-                        this.payload.push(result_ad)
+                        await new Check_save().Write("halou_updated", result_ad)
                     }
                 }
             } catch (error) {
